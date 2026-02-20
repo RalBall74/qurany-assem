@@ -141,7 +141,7 @@ const recitersData = [
     }
 ];
 
-// Surah list structure (Simplified, we will fetch full via API if needed)
+// This is a small preview list of Chapters; we usually download the full list from the internet anyway
 const surahListMeta = [
     { id: 1, name: "الفاتحة", englishName: "Al-Fatihah" },
     { id: 2, name: "البقرة", englishName: "Al-Baqarah" },

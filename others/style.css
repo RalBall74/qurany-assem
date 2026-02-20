@@ -50,7 +50,7 @@ body.dark-mode {
     width: 100%;
 }
 
-/* Animations */
+/* Smooth animations to make the app feel alive */
 @keyframes slideUpFade {
     from {
         opacity: 0;
@@ -120,7 +120,7 @@ body.dark-mode {
     }
 }
 
-/* Header */
+/* The navigation bar at the top with the logo and search */
 .top-header {
     height: auto;
     padding: 1.2rem;
@@ -222,7 +222,7 @@ body.dark-mode .search-bar:focus-within {
     box-shadow: 0 4px 10px rgba(230, 126, 34, 0.2);
 }
 
-/* Main Content Area */
+/* The middle part of the screen where everything is shown */
 .main-content {
     flex: 1;
     display: flex;
@@ -238,7 +238,7 @@ body.dark-mode .search-bar:focus-within {
     scroll-behavior: smooth;
 }
 
-/* Hide scrollbar */
+/* Making sure the scrollbars don't clutter the clean layout */
 .content-scroll::-webkit-scrollbar {
     display: none;
 }
@@ -266,7 +266,7 @@ body.dark-mode .search-bar:focus-within {
     border-radius: 10px;
 }
 
-/* Reciters Slider */
+/* The horizontal scrolling list of Quran reciters */
 .reciters-carousel {
     display: flex;
     gap: 1.2rem;
@@ -321,7 +321,7 @@ body.dark-mode .search-bar:focus-within {
     color: var(--primary-color);
 }
 
-/* Surah Grid */
+/* The list of all the Surahs (Chapters) */
 .surah-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -404,7 +404,7 @@ body.dark-mode .surah-card {
     transform: scale(1.1);
 }
 
-/* Floating Player Bar */
+/* The player control bar that follows you around as you scroll */
 .player-bar {
     position: fixed;
     bottom: 95px;
@@ -519,7 +519,7 @@ body.dark-mode .player-bar {
     animation: pulse-playing 1s ease-out;
 }
 
-/* Player Controls */
+/* Play, Pause, Previous, and Next buttons */
 .player-controls {
     display: flex;
     flex-direction: column;
@@ -563,7 +563,7 @@ body.dark-mode .player-bar {
     box-shadow: 0 10px 25px rgba(26, 188, 156, 0.5);
 }
 
-/* Progress Area */
+/* The line that shows how much of the surah you've listened to */
 .progress-area {
     width: 100%;
     display: flex;
@@ -598,7 +598,7 @@ body.dark-mode .player-bar {
     font-weight: 600;
 }
 
-/* Bottom Navigation */
+/* The main navigation tabs at the very bottom */
 .sidebar {
     position: fixed;
     bottom: 0;
@@ -683,7 +683,7 @@ body.dark-mode .app-copyright {
     opacity: 1;
 }
 
-/* Support & Timer Buttons Hover */
+/* Hover effects for the extra utility buttons */
 #support-btn,
 #sleep-timer-btn {
     transition: var(--transition-base);
@@ -696,7 +696,7 @@ body.dark-mode .app-copyright {
     transform: scale(1.1);
 }
 
-/* Theme Toggle inside Header top */
+/* The toggle switch to change between Day and Night modes */
 .theme-toggle .switch-label {
     width: 50px;
     height: 26px;
@@ -735,7 +735,7 @@ body.dark-mode .app-copyright {
     justify-content: space-around;
 }
 
-/* Offline Banner */
+/* A banner that pops up if you lose your internet connection */
 .offline-banner {
     background-color: #e67e22;
     color: white;
@@ -758,7 +758,7 @@ body.dark-mode .offline-banner {
     background-color: #d35400;
 }
 
-/* Modals & Viewer */
+/* Large popups that show verses or settings */
 .ayah-viewer {
     position: fixed;
     top: 50%;
@@ -855,7 +855,7 @@ body.dark-mode .ayah-txt:hover {
     margin: 0 5px;
 }
 
-/* Salawat Popup Premium Refinement */
+/* The popup that reminds you to send blessings upon the Prophet (PBUH) */
 .salawat-modal {
     display: none;
     opacity: 0;
@@ -928,7 +928,7 @@ body.dark-mode .salawat-content {
     background: #16a085;
 }
 
-/* Sleep Timer Modal Refinement */
+/* The popup for setting the automatic sleep timer */
 .modal {
     position: fixed;
     top: 0;
@@ -986,12 +986,12 @@ body.dark-mode .modal-content {
     background: transparent;
 }
 
-/* Volume controls hidden on mobile to save space */
+/* We hide these on small screens because browsers have their own volume buttons */
 .volume-controls {
     display: none;
 }
 
-/* Search & Status Styles */
+/* Special looks for search results and loading states */
 .ayah-snippet {
     font-size: 0.85rem;
     color: var(--text-muted);
@@ -1021,7 +1021,7 @@ body.dark-mode .ayah-snippet {
     color: var(--text-muted);
 }
 
-/* AI Chat Section Styles */
+/* The chat interface for the AI assistant */
 .ai-view {
     display: none;
     flex-direction: column;
@@ -1131,7 +1131,7 @@ body.dark-mode .ai-message .message-content {
     color: var(--text-dark);
 }
 
-/* Markdown styling inside AI messages */
+/* Making the AI's messages look formatted and nice */
 .message-content p {
     margin-bottom: 0.5rem;
 }
@@ -1235,7 +1235,7 @@ body.dark-mode .chat-input-wrapper:focus-within {
     box-shadow: none;
 }
 
-/* Typing indicator */
+/* The small dots that move while the AI is thinking of a reply */
 .typing-indicator {
     display: flex;
     gap: 4px;
@@ -1272,13 +1272,13 @@ body.dark-mode .chat-input-wrapper:focus-within {
     }
 }
 
-/* Adjust main content to not overlap with new layout if needed */
+/* Making sure the AI chat doesn't push other things off the screen */
 .main-content {
     position: relative;
     /* Ensure absolute positioning works inside */
 }
 
-/* Adjust fixed player and nav for AI view */
+/* Fixing the position of the chat box on top of the navigation */
 .ai-view .chat-input-area {
     position: fixed;
     bottom: 85px;
@@ -1290,7 +1290,7 @@ body.dark-mode .chat-input-wrapper:focus-within {
     /* Reset padding for fixed positioning */
 }
 
-/* Salawat Modal Specific Styles */
+/* Styling specifically for the Salawat popup modal */
 .salawat-modal {
     display: none;
     /* Controlled by JS */
@@ -1417,7 +1417,7 @@ body.dark-mode .salawat-text {
     transform: translateY(0);
 }
 
-/* More Options & Download Menu */
+/* The little '...' menu for extra actions on a Surah */
 .more-options-wrapper {
     position: relative;
     display: flex;
@@ -1506,7 +1506,7 @@ body.dark-mode .more-menu {
     text-align: center;
 }
 
-/* Download State */
+/* Showing that a file is already downloaded onto your device */
 .more-menu button[disabled] {
     opacity: 0.6;
     cursor: not-allowed;
@@ -1518,7 +1518,7 @@ body.dark-mode .more-menu {
     margin-right: auto;
 }
 
-/* Offline Modal Styles */
+/* Styling for the popup when you're completely offline */
 .offline-modal {
     display: none;
     /* Hidden by default */
@@ -1596,7 +1596,7 @@ body.dark-mode .offline-content {
     }
 }
 
-/* Others Section Styles */
+/* The 'Others' tab with extra features like Athkar and Prayer Times */
 .others-view {
     animation: slideUpFade 0.6s ease-out;
 }
@@ -1679,14 +1679,14 @@ body.dark-mode .other-card {
     color: var(--primary-color);
 }
 
-/* Response for larger screens if any */
+/* Making the grid look good on tablets and computers too */
 @media (min-width: 768px) {
     .others-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* Others Subviews Styles */
+/* Styling for the smaller views inside the 'Others' tab */
 .others-subview {
     position: absolute;
     top: 0;
@@ -1800,7 +1800,7 @@ body.dark-mode .thikr-card {
     font-weight: 800;
 }
 
-/* Developer Card */
+/* The information box about who built this app */
 .developer-card {
     background: var(--card-light);
     border-radius: 28px;
@@ -1867,7 +1867,7 @@ body.dark-mode .developer-card {
     box-shadow: 0 10px 25px rgba(26, 188, 156, 0.4);
 }
 
-/* Dua Card Styles */
+/* Styling for the daily supplication highlight */
 .dua-container {
     background: var(--card-light);
     border-radius: 28px;
@@ -1916,7 +1916,7 @@ body.dark-mode .dua-text {
     transform: rotate(-15deg);
 }
 
-/* Tafsir Modal Styles */
+/* The popup that shows the meaning and explanation of verses */
 .tafsir-content {
     max-width: 500px;
     width: 90%;
@@ -2002,7 +2002,7 @@ body.dark-mode .tafsir-body {
     color: var(--text-muted);
 }
 
-/* Rosary (Tasbih) View */
+/* The interactive Tasbih (Rosary) counter screen */
 .rosary-container {
     display: flex;
     flex-direction: column;
@@ -2143,7 +2143,7 @@ body.dark-mode .rosary-reset {
     }
 }
 
-/* Prayer Times */
+/* The screen that shows the five daily prayer timings */
 .prayer-container {
     padding: 10px;
     animation: slideUpFade 0.5s ease-out;
@@ -2234,7 +2234,7 @@ body.dark-mode .prayer-item {
     margin-right: 5px;
 }
 
-/* ===== PWA Install Banner ===== */
+/* ===== The banner asking users to install the app on their phone ===== */
 @keyframes slideUpBanner {
     from {
         opacity: 0;

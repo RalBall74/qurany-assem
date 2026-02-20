@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
+    // Getting references to all the parts of the page we need to work with
     const surahListEl = document.getElementById('surah-list');
     const recitersGridEl = document.getElementById('reciters-grid');
     const searchInput = document.getElementById('surah-search');
@@ -58,14 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const offlineBanner = document.getElementById('offline-banner');
 
 
-    // State
+    // This is where we keep track of what's happening in the app right now
     let allSurahs = [];
     let currentReciter = recitersData[0];
     let currentSurahIndex = -1;
     let favorites = JSON.parse(localStorage.getItem('quran_favorites')) || [];
     let isPlaying = false;
     let sleepTimer = null;
-    let searchType = 'surah'; // 'surah' or 'ayah'
+    let searchType = 'surah'; // Can be 'surah' to find chapters or 'ayah' to find specific verses
     let searchDebounceTimer = null;
     let currentTafsirEdition = localStorage.getItem('quran_tafsir_edition') || 'ar.muyassar';
     let activeTafsirAyah = null;
@@ -74,26 +74,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let notificationPreferences = { prayer: false };
     let readingObserver = null;
 
-    // --- initialization ---
+    // --- getting things ready when the app starts ---
     init();
 
     async function init() {
         renderReciters();
         await fetchSurahs();
-        loadLastPlayback(); // Load last playback state
+        loadLastPlayback(); // Pick up right where you left off last time
         setupEventListeners();
         applyTheme();
         updateFavoritesUI();
         showSalawatModal('ramadan');
         if (tafsirEngineSelect) tafsirEngineSelect.value = currentTafsirEdition;
 
-        // Set initial player info if not loaded from playback
+        // If it's your first time or we didn't save anything, show the default reciter info
         if (currentReciter && playerSurah.textContent === 'اختر سورة') {
             playerReciter.textContent = currentReciter.name;
             playerImg.src = currentReciter.img;
         }
 
-        // Online Status
+        // Keeping an eye on whether the user is online or offline
         updateOnlineStatus();
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Data Fetching ---
+    // --- Fetching data from the internet ---
     async function fetchSurahs() {
         try {
             const response = await fetch('https://api.alquran.cloud/v1/surah');
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Rendering ---
+    // --- Putting things on the screen ---
     function renderReciters() {
         recitersGridEl.innerHTML = recitersData.map(reciter => `
             <div class="reciter-card ${reciter.id === currentReciter.id ? 'active' : ''}" data-id="${reciter.id}">
@@ -186,11 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Audio Logic ---
+    // --- Everything related to playing sound ---
     function playSurah(surah, index = -1) {
         if (index !== -1) currentSurahIndex = index;
 
-        // Format surah number to 001, 002...
+        // We need the number in a 001, 002... format for the audio links to work
         const formattedNumber = String(surah.number).padStart(3, '0');
         const audioUrl = `${currentReciter.server}${formattedNumber}.mp3`;
 
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         favBtn.querySelector('i').className = isFav ? 'fas fa-heart' : 'far fa-heart';
 
         playerAudio.play();
-        // State updates now handled by audio event listeners
+        // The player bar handles its own updates when the audio starts/stops
         // setupMediaSession(surah); // We still need this to set metadata
         setupMediaSession(surah);
 
@@ -214,30 +214,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function setupMediaSession(surah) {
-        if ('mediaSession' in navigator) {
-            try {
-                // Generate dynamic branded artwork with site colors
-                const brandedArtworkUrl = await generateBrandedArtwork(currentReciter.img, currentReciter.name);
-                const appIconUrl = new URL('images/icon-512x512.jpg', window.location.href).href;
+        // This lets you see what's playing on your phone's lock screen or notification area
+        try {
+            // Create a nice branded image for the lock screen using the reciter's photo
+            const brandedArtworkUrl = await generateBrandedArtwork(currentReciter.img, currentReciter.name);
+            const appIconUrl = new URL('images/icon-512x512.jpg', window.location.href).href;
 
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: surah.name,
-                    artist: currentReciter.name,
-                    album: 'تطبيق قرآني',
-                    artwork: [
-                        { src: brandedArtworkUrl, sizes: '512x512', type: 'image/png' },
-                        { src: appIconUrl, sizes: '512x512', type: 'image/png' }
-                    ]
-                });
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: surah.name,
+                artist: currentReciter.name,
+                album: 'تطبيق قرآني',
+                artwork: [
+                    { src: brandedArtworkUrl, sizes: '512x512', type: 'image/png' },
+                    { src: appIconUrl, sizes: '512x512', type: 'image/png' }
+                ]
+            });
 
-                // Action Handlers
-                navigator.mediaSession.setActionHandler('play', () => { playerAudio.play(); });
-                navigator.mediaSession.setActionHandler('pause', () => { playerAudio.pause(); });
-                navigator.mediaSession.setActionHandler('previoustrack', () => { playPrev(); });
-                navigator.mediaSession.setActionHandler('nexttrack', () => { playNext(); });
-            } catch (error) {
-                console.error('Media Session update failed:', error);
-            }
+            // Action Handlers
+            navigator.mediaSession.setActionHandler('play', () => { playerAudio.play(); });
+            navigator.mediaSession.setActionHandler('pause', () => { playerAudio.pause(); });
+            navigator.mediaSession.setActionHandler('previoustrack', () => { playPrev(); });
+            navigator.mediaSession.setActionHandler('nexttrack', () => { playNext(); });
+        } catch (error) {
+            console.error('Media Session update failed:', error);
         }
     }
 
@@ -248,14 +247,14 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
 
-            // 1. Background Gradient (Site Colors: #1abc9c to #16a085)
+            // 1. A nice gradient background using the app's signature colors
             const gradient = ctx.createLinearGradient(0, 0, 0, 512);
             gradient.addColorStop(0, '#1abc9c');
             gradient.addColorStop(1, '#16a085');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 512, 512);
 
-            // 2. Subtle Design Element (Circle glow)
+            // 2. Add a soft glow behind the photo for a premium look
             ctx.globalAlpha = 0.1;
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
@@ -263,9 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fill();
             ctx.globalAlpha = 1.0;
 
-            // 3. Load Reciter Image
+            // 3. Put the reciter's face in the middle
             const img = new Image();
-            // Ensure absolute URL for canvas loading
+            // Use the full URL so the canvas can load it properly
             img.src = new URL(imgSrc, window.location.href).href;
             img.crossOrigin = "anonymous";
 
@@ -301,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 resolve(canvas.toDataURL('image/png'));
             };
             img.onerror = () => {
-                // Fallback to absolute URL of original image
+                // If something goes wrong, just use the original reciter image as a backup
                 resolve(new URL(imgSrc, window.location.href).href);
             };
         });
@@ -315,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function togglePlay() {
         if (currentSurahIndex === -1) {
-            // Pick first surah if nothing selected
+            // If nothing is selected yet, just start from the very beginning (Surah Al-Fatihah)
             playSurah(allSurahs[0], 0);
             return;
         }
@@ -342,14 +341,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Search & Filters ---
+    // --- Helping people find what they're looking for ---
     function normalizeArabic(text) {
         if (!text) return "";
         return text
-            .replace(/[\u064B-\u0652]/g, "") // Remove Tashkeel (diacritics)
-            .replace(/[أإآ]/g, "ا")         // Normalize Alef
-            .replace(/ة/g, "ه")             // Normalize Teh Marbuta
-            .replace(/ى/g, "ي");            // Normalize Alef Maksura
+            .replace(/[\u064B-\u0652]/g, "") // Get rid of those little marks over the letters (diacritics)
+            .replace(/[أإآ]/g, "ا")         // Make all types of 'Alef' look the same
+            .replace(/ة/g, "ه")             // Treat 'Teh Marbuta' like a regular 'Heh'
+            .replace(/ى/g, "ي");            // And treat 'Alef Maksura' like 'Yeh' for easier searching
     }
 
     function handleSearch(query) {
@@ -366,8 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
             renderSurahs(filtered);
         } else {
-            // Debounce API call for ayah search
-            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+            // Wait a little bit after the user stops typing before we start searching to be more efficient
             searchDebounceTimer = setTimeout(() => {
                 handleAyahSearch(query);
             }, 600);
@@ -378,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (query.length < 3) return;
         surahListEl.innerHTML = '<div class="loader">جاري البحث في الآيات...</div>';
         try {
-            // Using quran-simple for better search results without diacritics
+            // We search through a version without diacritics so it's easier to find matches
             const response = await fetch(`https://api.alquran.cloud/v1/search/${query}/all/quran-simple`);
             const data = await response.json();
 
@@ -447,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Reading Tracker ---
+    // --- Keeping track of where you are in a Surah ---
     function setupReadingObserver(surahNumber) {
         if (readingObserver) {
             readingObserver.disconnect();
@@ -461,12 +459,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }, {
-            root: ayahViewer, // Only track when scrolling within the viewer overlay
-            rootMargin: '-20% 0px -20% 0px', // Center focused ayahs
+            root: ayahViewer, // We only care about tracking when you're actually looking at the verses
+            rootMargin: '-20% 0px -20% 0px', // Focus on the verses in the middle of the screen
             threshold: 0
         });
 
-        // Delay observing slightly to ensure DOM covers rendering/layout
+        // Give the page a tiny moment to settle before we start watching the scroll position
         setTimeout(() => {
             document.querySelectorAll('.ayah-txt').forEach(el => {
                 readingObserver.observe(el);
@@ -474,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 
-    // --- Theme & Extras ---
+    // --- Changing the look and extra bits ---
     function applyTheme() {
         const isDark = localStorage.getItem('theme') === 'dark';
         themeSwitch.checked = isDark;
@@ -483,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateMetaThemeColor(isDark) {
-        // We match the status bar with the app background to make it seamless
+        // We change the browser's top bar color so it blends in with our app design
         const themeColor = isDark ? '#0f172a' : '#ffffff';
         const metaThemeColor = document.querySelector('meta[name="theme-color"]');
         if (metaThemeColor) {
@@ -492,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateFavoritesUI() {
-        // This would be called when switching to "Favorites" tab
+        // Show the list of Surahs you've liked when you go to the "Favorites" tab
         const activeTab = document.querySelector('.nav-item.active').dataset.target;
         if (activeTab === 'favorites') {
             const favSurahs = allSurahs.filter(s => favorites.includes(s.number));
@@ -508,15 +506,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('close-salawat');
 
         if (type === 'ramadan') {
+            // Special festive look for the holy month of Ramadan
             icon.className = 'fas fa-moon';
-            if (iconContainer) iconContainer.style.color = '#f1c40f'; // Gold for moon
-            title.style.color = '#e67e22'; // Warm Ramadan color
+            if (iconContainer) iconContainer.style.color = '#f1c40f'; // Use a gold color for the crescent moon
+            title.style.color = '#e67e22'; // A nice warm orange for the greeting
             title.textContent = '🌙 رمضان مبارك 🌙';
             text.textContent = 'حاول ان تكون نسخة افضل من نفسك في رمضان';
             btn.textContent = 'مبارك علينا وعليكم';
         } else {
+            // Regular friendly reminder to send blessings
             icon.className = 'fas fa-heart';
-            if (iconContainer) iconContainer.style.color = ''; // Reset to CSS default (#e74c3c)
+            if (iconContainer) iconContainer.style.color = ''; // Back to the normal red heart
             title.style.color = 'var(--primary-color)';
             title.textContent = '🤍صلى على اشرف الخلق🤍';
             text.textContent = 'صلى عليه وخد حسنات وادعيلي';
@@ -527,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSalawatModal(type = 'salawat') {
         updateSalawatContent(type);
 
-        // Show the modal
+        // Make the modal visible on the screen
         setTimeout(() => {
             salawatModal.style.display = 'flex';
             setTimeout(() => {
@@ -552,20 +552,20 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
     }
 
-    // Set interval to show every 5 minutes (5 * 60 * 1000 ms)
+    // We want to show this reminder every 5 minutes to keep it fresh in mind
     setInterval(() => {
         if (salawatModal.style.display !== 'flex') {
             showSalawatModal('salawat');
         }
     }, 5 * 60 * 1000);
 
-    // --- Event Listeners ---
+    // --- Handling all the clicks and interactions ---
     function setupEventListeners() {
         playBtn.addEventListener('click', togglePlay);
         nextBtn.addEventListener('click', playNext);
         prevBtn.addEventListener('click', playPrev);
 
-        // Progress update
+        // Keep the progress bar moving while the audio plays
         playerAudio.addEventListener('timeupdate', (e) => {
             const { currentTime, duration } = e.target;
             const progressPercent = (currentTime / duration) * 100;
@@ -574,13 +574,13 @@ document.addEventListener('DOMContentLoaded', () => {
             currentTimeEl.textContent = formatTime(currentTime);
             if (duration) durationEl.textContent = formatTime(duration);
 
-            // Save state every 5 seconds
+            // Remember where we are every 5 seconds just in case the app closes
             if (Math.floor(currentTime) % 5 === 0) {
                 savePlaybackState();
             }
         });
 
-        // Sync UI with audio events
+        // Make sure the play/pause button and animations match the actual audio state
         playerAudio.addEventListener('play', () => {
             isPlaying = true;
             updatePlayBtn();
@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateMetaThemeColor(isDark);
         });
 
-        // Navigation
+        // Handling the main menu at the bottom of the screen
         navItems.forEach(item => {
             item.addEventListener('click', () => {
                 navItems.forEach(i => i.classList.remove('active'));
@@ -677,7 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Other Section Buttons
+        // Buttons for the "Others" extra features section
         document.getElementById('athkar-btn')?.addEventListener('click', () => {
             othersSection.style.display = 'none';
             athkarView.style.display = 'block';
@@ -695,7 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
             duaTextEl.textContent = getDuaOfTheDay();
         });
 
-        // Back Buttons
+        // Helping you get back to the previous screen
         document.getElementById('athkar-back')?.addEventListener('click', () => {
             athkarView.style.display = 'none';
             othersSection.style.display = 'block';
@@ -725,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Rosary
+        // Everything for the digital prayer beads counter
         if (rosaryBtn) {
             rosaryBtn.addEventListener('click', () => {
                 if (othersSection) othersSection.style.display = 'none';
@@ -733,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- Rosary logic inside listener setup ---
+        // --- This part handles the actual counting for the Rosary ---
         const rosaryCountKey = 'quran_rosary_count';
         let rosaryCount = parseInt(localStorage.getItem(rosaryCountKey)) || 0;
         if (rosaryCountEl) rosaryCountEl.textContent = rosaryCount;
@@ -759,7 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Prayer View button
+        // Button to open the prayer timings screen
         if (prayerTimesBtn) {
             prayerTimesBtn.addEventListener('click', () => {
                 if (othersSection) othersSection.style.display = 'none';
@@ -770,7 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Athkar Category Switching
+        // Switching between different types of Athkar (supplications)
         document.querySelectorAll('.athkar-categories button').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.athkar-categories button').forEach(b => b.classList.remove('active'));
@@ -779,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Favorites
+        // Letting you like or unlike a Surah for quick access later
         favBtn.addEventListener('click', () => {
             if (currentSurahIndex === -1) return;
             const surahNumber = allSurahs[currentSurahIndex].number;
@@ -795,7 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateFavoritesUI();
         });
 
-        // Quran Text / Ayah Viewer
+        // This is for reading the actual text of the Quranic verses on screen
         showTextBtn.addEventListener('click', async () => {
             if (currentSurahIndex === -1) return;
             const surah = allSurahs[currentSurahIndex];
@@ -846,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Sleep Timer
+        // Setting up the sleep timer so the audio stops by itself while you sleep
         sleepTimerBtn.addEventListener('click', () => {
             timerModal.style.display = 'flex';
         });
@@ -877,7 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
 
-        // Salawat Modal
+        // Handling the popup reminder for blessings
         closeSalawat.addEventListener('click', () => {
             salawatModal.classList.remove('show');
             setTimeout(() => { salawatModal.style.display = 'none'; }, 400);
@@ -938,16 +938,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayPrayerTimes(data) {
-        prayersTimings = data.timings; // Store for notification check
+        prayersTimings = data.timings; // Saving these so we know when to send notifications if needed
         const timings = data.timings;
         const date = data.date;
 
-        // Update Date & Header
+        // Refreshing the date and location info on the screen
         prayerGregorianDate.textContent = date.gregorian.date;
         prayerHijriDate.textContent = `${date.hijri.day} ${date.hijri.month.ar} ${date.hijri.year}`;
         prayerLocation.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${data.meta.timezone}`;
 
-        // Filter and Translate Prayer Names
+        // We only show the main 5 prayers plus Sunrise, with clear Arabic names and icons
         const prayers = [
             { key: 'Fajr', name: 'الفجر', icon: 'fa-cloud-sun' },
             { key: 'Sunrise', name: 'الشروق', icon: 'fa-sun' },
@@ -957,7 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { key: 'Isha', name: 'العشاء', icon: 'fa-moon' }
         ];
 
-        // Render List
+        // Building the list of prayer times to display
         prayerTimesList.innerHTML = prayers.map(p => {
             return `
                 <div class="prayer-item" id="prayer-${p.key}">
@@ -1024,7 +1024,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return duasData[index];
     }
 
-    // --- Tafsir Logic ---
+    // --- Getting detailed explanations and meanings of the verses ---
     async function showTafsir(surahNum, ayahNum) {
         activeTafsirSurah = surahNum;
         activeTafsirAyah = ayahNum;
@@ -1053,7 +1053,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Utils ---
+    // --- Handy little helper functions used throughout the code ---
     function formatTime(seconds) {
         if (isNaN(seconds)) return '00:00';
         const min = Math.floor(seconds / 60);
@@ -1061,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
     }
 
-    // --- Persistence ---
+    // --- Saving and loading data locally so you don't lose progress ---
     function savePlaybackState() {
         if (currentSurahIndex === -1) return;
         const state = {
@@ -1072,15 +1072,15 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('quran_last_play', JSON.stringify(state));
     }
 
-    // --- Offline Download Logic ---
+    // --- Letting you download audio files so you can listen without internet ---
     async function checkDownloadStatus(url) {
         if (!downloadBtn) return;
 
-        // Reset button state
+        // Put the button back to its starting look before checking the status
         downloadBtn.className = 'download-btn';
         downloadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i>';
         downloadBtn.title = 'تحميل السورة';
-        downloadBtn.onclick = null; // Clear previous handlers
+        downloadBtn.onclick = null; // Remove any old click actions to avoid confusion
 
         try {
             const cache = await caches.open('quran-audio-v1');
@@ -1090,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 downloadBtn.classList.add('downloaded');
                 downloadBtn.innerHTML = '<i class="fas fa-check"></i>';
                 downloadBtn.title = 'تم التحميل (متاح بدون انترنت)';
-                // Optional: Delete functionality
+                // If it's already on the device, clicking the button lets you delete it instead
                 downloadBtn.onclick = async () => {
                     if (confirm('هل تريد حذف السورة من التحميلات؟')) {
                         await cache.delete(url);
@@ -1108,20 +1108,18 @@ document.addEventListener('DOMContentLoaded', () => {
     async function downloadSurah(url) {
         if (!downloadBtn) return;
 
-        // Set loading state
+        // Show a spinning icon while the download is in progress
         downloadBtn.className = 'download-btn downloading';
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         try {
             const cache = await caches.open('quran-audio-v1');
 
-            // We use fetch to get the response, tracking progress if possible
-            // Note: Fetch API doesn't natively support progress for response body in all envs smoothly without Streams
-            // For simplicity in this context, we'll request it and put in cache.
+            // We'll just download the whole file and stick it in the browser's permanent stash
 
             await cache.add(url);
 
-            // Check again to confirm and update UI
+            // Refresh the button icon once everything is finished successfully
             checkDownloadStatus(url);
 
         } catch (error) {
@@ -1149,12 +1147,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const formattedNumber = String(surah.number).padStart(3, '0');
                     playerAudio.src = `${currentReciter.server}${formattedNumber}.mp3`;
 
-                    // Set saved time
+                    // Start exactly from the minute and second where you last stopped
                     playerAudio.addEventListener('loadedmetadata', () => {
                         playerAudio.currentTime = lastPlay.currentTime || 0;
                     }, { once: true });
 
-                    // Update UI states
+                    // Make sure the download button and everything else matches the current track
                     checkDownloadStatus(playerAudio.src);
                     renderReciters();
                     renderSurahs(allSurahs);

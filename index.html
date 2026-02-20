@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
-<!-- Google tag (gtag.js) -->
+<!-- Setting up Google Analytics to see how the app is doing -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E6FX97WVER"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -15,7 +15,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <!-- Primary Meta Tags -->
+    <!-- Basic info for search engines and social media -->
     <title>قرآني - سماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء</title>
     <meta name="title" content="قرآني - سماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء">
     <meta name="description"
@@ -25,7 +25,7 @@
     <meta name="author" content="عاصم محمد كمال ابو النصر">
     <link rel="canonical" href="https://ralball74.github.io/qurany.assem/">
 
-    <!-- Open Graph / Facebook -->
+    <!-- How the app looks when shared on Facebook and similar sites -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ralball74.github.io/qurany.assem/">
     <meta property="og:title" content="قرآني - رفيقك اليومي مع كلام الله">
@@ -33,7 +33,7 @@
         content="تطبيق متكامل لاستماع القرآن الكريم بأصوات القراء المفضلين لديك مع ميزات ذكية ومتطورة.">
     <meta property="og:image" content="https://ralball74.github.io/qurany.assem/icon-512x512.jpg">
 
-    <!-- Twitter -->
+    <!-- How the app looks on X (formerly Twitter) -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://ralball74.github.io/qurany.assem/">
     <meta property="twitter:title" content="قرآني - رفيقك اليومي مع كلام الله">
@@ -41,7 +41,7 @@
         content="تطبيق متكامل لاستماع القرآن الكريم بأصوات القراء المفضلين لديك مع ميزات ذكية ومتطورة.">
     <meta property="twitter:image" content="https://ralball74.github.io/qurany.assem/icon-512x512.jpg">
 
-    <!-- Structured Data (Schema.org) -->
+    <!-- Helping search engines understand what this app is about -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -59,7 +59,7 @@
     </script>
 
     <link rel="stylesheet" href="others/style.css">
-    <!-- Google Fonts -->
+    <!-- Bringing in some nice-looking fonts from Google -->
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap"
         rel="stylesheet">
@@ -68,13 +68,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-    <!-- Font Awesome -->
+    <!-- Icons we use throughout the app -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body class="light-mode">
     <div class="app-container">
-        <!-- Header Section -->
+        <!-- This is the top part with the logo and search bar -->
         <header class="top-header">
             <div class="header-top">
                 <div class="logo">
@@ -106,24 +106,24 @@
             </div>
         </header>
 
-        <!-- Offline Banner -->
+        <!-- This shows up only when there's no internet connection -->
         <div id="offline-banner" class="offline-banner" style="display: none;">
             <i class="fas fa-wifi-slash"></i>
             <span>لا يوجد اتصال بالإنترنت - تعمل فقط السور المحملة</span>
         </div>
 
-        <!-- Main Scrollable Content -->
+        <!-- The main part of the app where all the content goes -->
         <main class="main-content">
             <section id="content-area" class="content-scroll">
-                <!-- Reciter Carousel -->
+                <!-- A horizontal list of Quran reciters -->
                 <div class="section-header">
                     <h2>القراء</h2>
                 </div>
                 <div id="reciters-grid" class="reciters-carousel">
-                    <!-- Reciter cards injected here -->
+                    <!-- Reciter cards will be added here via JavaScript -->
                 </div>
 
-                <!-- Surah List -->
+                <!-- The list of Surahs (Chapters) of the Quran -->
                 <div class="section-header">
                     <h2 id="current-category">السور</h2>
                 </div>
@@ -132,7 +132,7 @@
                 </div>
             </section>
 
-            <!-- AI Chat Section -->
+            <!-- Talk to the AI assistant for any questions -->
             <section id="ai-section" class="ai-view" style="display: none;">
                 <div class="ai-header">
                     <h2>مساعدك الذكي</h2>
@@ -153,7 +153,7 @@
                 </div>
             </section>
 
-            <!-- Others Section -->
+            <!-- Extra tools like Dua of the day and prayer times -->
             <section id="others-section" class="others-view" style="display: none;">
                 <div class="section-header">
                     <h2>أخرى</h2>
@@ -198,7 +198,7 @@
                 </div>
             </section>
 
-            <!-- About Developer Section -->
+            <!-- A little bit about the person who made this app -->
             <section id="about-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="about-back"><i class="fas fa-arrow-right"></i></button>
@@ -220,7 +220,7 @@
                 </div>
             </section>
 
-            <!-- Dua of the Day View -->
+            <!-- Shows a different supplication every day -->
             <section id="dua-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="dua-back"><i class="fas fa-arrow-right"></i></button>
@@ -231,7 +231,7 @@
                 </div>
             </section>
 
-            <!-- Rosary View -->
+            <!-- A simple digital prayer beads counter -->
             <section id="rosary-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="rosary-back"><i class="fas fa-arrow-right"></i></button>
@@ -252,7 +252,7 @@
                 </div>
             </section>
 
-            <!-- Prayer Times View -->
+            <!-- Daily prayer timings based on your location -->
             <section id="prayer-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="prayer-back"><i class="fas fa-arrow-right"></i></button>
@@ -273,7 +273,7 @@
             </section>
 
 
-            <!-- Ayah Viewer Overlay -->
+            <!-- This is where you can read the actual verses of a Surah -->
             <div id="ayah-viewer" class="ayah-viewer">
                 <div class="ayah-header">
                     <h3 id="viewer-title">سورة الفاتحة</h3>
@@ -284,9 +284,9 @@
             </div>
         </main>
 
-        <!-- Floating Player Bar -->
+        <!-- The music-player-style bar at the bottom -->
         <footer class="player-bar">
-            <!-- Info & Actions Row -->
+            <!-- Surah info and quick action buttons -->
             <div class="song-info">
                 <div class="info-left">
                     <img src="images/4.jpg" alt="صورة القارئ - تطبيق قرآني" id="player-img">
@@ -304,7 +304,7 @@
                 </div>
             </div>
 
-            <!-- Controls & Progress Column -->
+            <!-- Play/Pause, Next/Prev, and the progress slider -->
             <div class="player-controls">
                 <div class="progress-area">
                     <span id="current-time" class="time-label">00:00</span>
@@ -321,7 +321,7 @@
             </div>
         </footer>
 
-        <!-- Bottom Navigation -->
+        <!-- The main menu at the very bottom -->
         <nav class="sidebar">
             <div class="nav-menu">
                 <button class="nav-item active" data-target="home">
@@ -345,7 +345,7 @@
         </nav>
     </div>
 
-    <!-- PWA Install Prompt -->
+    <!-- A popup asking if you want to install this as an app -->
     <div id="pwa-install-banner" class="pwa-install-banner" style="display:none;">
         <div class="pwa-install-content">
             <div class="pwa-icon-wrap">
@@ -367,7 +367,7 @@
         </div>
     </div>
 
-    <!-- Salawat Popup Modal -->
+    <!-- A friendly reminder to pray for the Prophet (PBUH) -->
     <div id="salawat-modal" class="modal salawat-modal">
         <div class="modal-content salawat-content">
             <div class="salawat-icon" id="salawat-icon-container">
@@ -379,7 +379,7 @@
         </div>
     </div>
 
-    <!-- Sleep Timer Modal -->
+    <!-- Set a timer to automatically stop the audio later -->
     <div id="timer-modal" class="modal">
         <div class="modal-content">
             <h3>مؤقت النوم</h3>
@@ -393,7 +393,7 @@
         </div>
     </div>
 
-    <!-- Tafsir Modal -->
+    <!-- Deep dive into the meaning of a verse -->
     <div id="tafsir-modal" class="modal">
         <div class="modal-content tafsir-content">
             <div class="tafsir-header">
@@ -429,12 +429,12 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(reg => {
-                    // Check for updates every time the page loads
+                    // We check for any updates every time someone opens the page
                     reg.update();
                 });
             });
 
-            // Reload the page when a new service worker takes control
+            // If there's a new version, refresh the page to use it
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (!refreshing) {
@@ -444,7 +444,7 @@
             });
         }
 
-        // ===== PWA Install Prompt =====
+        // ===== Asking the user to install the app =====
         let deferredPrompt;
         const pwaInstallBanner = document.getElementById('pwa-install-banner');
         const pwaInstallBtn = document.getElementById('pwa-install-btn');
@@ -454,7 +454,7 @@
             e.preventDefault();
             deferredPrompt = e;
 
-            // Show banner only if user hasn't dismissed it before
+            // Don't annoy the user if they've already said no or dismissed it
             const dismissed = localStorage.getItem('pwa-install-dismissed');
             if (!dismissed) {
                 setTimeout(() => {
@@ -481,7 +481,7 @@
             setTimeout(() => { pwaInstallBanner.style.display = 'none'; }, 400);
         });
 
-        // Hide banner when app is installed
+        // Once it's installed, we don't need the banner anymore
         window.addEventListener('appinstalled', () => {
             pwaInstallBanner.classList.remove('visible');
             setTimeout(() => { pwaInstallBanner.style.display = 'none'; }, 400);

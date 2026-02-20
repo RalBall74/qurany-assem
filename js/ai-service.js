@@ -47,18 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = aiInput.value.trim();
         if (!text) return;
 
-
+        // Clear the box and stop people from clicking twice while we wait
         aiInput.value = '';
         sendAiBtn.disabled = true;
 
-
+        // Put the user's message on the screen
         appendMessage('user', text);
 
-
+        // Show those three little dots to show we're thinking
         const loadingId = showTypingIndicator();
 
         try {
-
+            // Check if we even have a key to talk to the AI
             if (!apiKey || apiKey.length < 10) {
                 throw new Error("KEY_NOT_CONFIGURED");
             }
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function callGeminiAPI(prompt) {
-
+        // This is the direct line to Google's AI server
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
         try {
