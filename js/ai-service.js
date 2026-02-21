@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const aiInput = document.getElementById('ai-input');
     const sendAiBtn = document.getElementById('send-ai-btn');
-    const chatContainer = document.getElementById('chat-container');
+    const chatBox = document.getElementById('chat-container');
 
 
     const _k1 = ["Sy", "CK", "AIza", "ZfZl1r"];
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const apiKey = _initSecureKey();
+    // console.log('key loaded');
 
 
 
@@ -47,45 +48,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = aiInput.value.trim();
         if (!text) return;
 
-        // Clear the box and stop people from clicking twice while we wait
+        // Resit UI state
         aiInput.value = '';
         sendAiBtn.disabled = true;
 
-        // Put the user's message on the screen
+        // Append user prompt
         appendMessage('user', text);
 
-        // Show those three little dots to show we're thinking
-        const loadingId = showTypingIndicator();
+        // Show loading state
+        const tid = showTypingIndicator();
 
         try {
-            // Check if we even have a key to talk to the AI
+            // API availablity check
             if (!apiKey || apiKey.length < 10) {
                 throw new Error("KEY_NOT_CONFIGURED");
             }
 
             const response = await callGeminiAPI(text);
-            removeMessage(loadingId);
+            removeMessage(tid);
             appendMessage('ai', response);
         } catch (error) {
-            removeMessage(loadingId);
-            let errorMsg = 'عذراً، حدث خطأ تقني.';
+            removeMessage(tid);
+            let msg = 'عذراً، حدث خطأ تقني.';
 
             if (error.message === 'KEY_NOT_CONFIGURED') {
-                errorMsg = 'لم يتم إعداد مفتاح API في الكود. يرجى من المطور وضع المفتاح الجديد.';
+                msg = 'لم يتم إعداد مفتاح API في الكود. يرجى من المطور وضع المفتاح الجديد.';
             } else if (error.message.includes('leaked') || error.message.includes('API key')) {
-                errorMsg = 'مفتاح API غير صالح. (ربما تم حظره أو نسخه بشكل خاطئ).';
+                msg = 'مفتاح API غير صالح. (ربما تم حظره أو نسخه بشكل خاطئ).';
             } else if (error.message.includes('400')) {
-                errorMsg = 'حدث خطأ في الطلب. (400 Bad Request).';
+                msg = 'حدث خطأ في الطلب. (400 Bad Request).';
             } else if (error.message.includes('Failed to fetch')) {
-                errorMsg = 'تأكد من اتصالك بالإنترنت.';
+                msg = 'تأكد من اتصالك بالإنترنت.';
             }
 
-            appendMessage('ai', `${errorMsg}\n<span style="font-size:0.7em; opacity:0.7">(${error.message})</span>`);
+            appendMessage('ai', `${msg}\n<span style="font-size:0.7em; opacity:0.7">(${error.message})</span>`);
         }
     }
 
     async function callGeminiAPI(prompt) {
-        // This is the direct line to Google's AI server
+        // Endpoint setup
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
         try {
@@ -139,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         div.appendChild(avatar);
         div.appendChild(content);
 
-        chatContainer.appendChild(div);
+        chatBox.appendChild(div);
         scrollToBottom();
         return div.id = 'msg-' + Date.now();
     }
@@ -165,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         div.appendChild(avatar);
         div.appendChild(content);
-        chatContainer.appendChild(div);
+        chatBox.appendChild(div);
         scrollToBottom();
         return div.id;
     }
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function formatText(text) {
