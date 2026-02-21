@@ -1937,6 +1937,32 @@ body.dark-mode .developer-card {
     box-shadow: 0 10px 25px rgba(26, 188, 156, 0.4);
 }
 
+.whatsapp-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #25D366;
+    color: white;
+    text-decoration: none;
+    padding: 14px;
+    border-radius: 15px;
+    font-weight: 700;
+    transition: var(--transition-base);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+    margin-top: 15px;
+}
+
+.whatsapp-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+    background: #20ba5a;
+}
+
+.whatsapp-link i {
+    font-size: 1.2rem;
+}
+
 /* Styling for the daily supplication highlight */
 .dua-container {
     background: var(--card-light);
