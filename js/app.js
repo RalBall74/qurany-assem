@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Handle navigation from shortcuts or direct links
         handleDeepLink();
+        window.addEventListener('hashchange', handleDeepLink);
     }
 
     function updateOnlineStatus() {
