@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // لم الحوارات من الصفحة
+    // DOM Elements
     const surahListEl = document.getElementById('surah-list');
     const recitersGridEl = document.getElementById('reciters-grid');
     const searchInput = document.getElementById('surah-search');
@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const salawatModal = document.getElementById('salawat-modal');
     const closeSalawat = document.getElementById('close-salawat');
     const othersSection = document.getElementById('others-section');
+    const athkarView = document.getElementById('athkar-view');
     const aboutView = document.getElementById('about-view');
     const playerBar = document.querySelector('.player-bar');
     const rosaryBtn = document.getElementById('rosary-btn');
@@ -57,14 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const offlineBanner = document.getElementById('offline-banner');
 
 
-    // حالة التطبيق
+    // App State
     let surahs = [];
     let reciter = recitersData[0];
     let curIdx = -1;
     let favorites = JSON.parse(localStorage.getItem('quran_favorites')) || [];
     let isPlaying = false;
     let sleepTimer = null;
-    let searchType = 'surah'; // نبحث عن سور ولا آيات؟
+    let searchType = 'surah'; // Can be 'surah' to find chapters or 'ayah' to find specific verses
     let searchDebounceTimer = null;
     let currentTafsirEdition = localStorage.getItem('quran_tafsir_edition') || 'ar.muyassar';
     let activeTafsirAyah = null;
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let notificationPreferences = { prayer: false };
     let readingObserver = null;
 
-    // بداية الليلة
+    // Init app logic
     init();
 
     async function init() {
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderReciters();
         await fetchSurahs();
         // console.log('Surahs ready:', surahs.length);
-        loadLastPlayback(); // رجعنا مطرح ما كنا
+        loadLastPlayback(); // Resume last session
         setupEventListeners();
         applyTheme();
         updateFavoritesUI();
@@ -93,13 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
             playerImg.src = reciter.img;
         }
 
+        // Status monitoring
         updateOnlineStatus();
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
-
-        // Handle navigation from shortcuts or direct links
-        handleDeepLink();
-        window.addEventListener('hashchange', handleDeepLink);
     }
 
     function updateOnlineStatus() {
@@ -110,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // هات البيانات من النت
+    // Data fitching from API
     async function fetchSurahs() {
         try {
             const response = await fetch('https://api.alquran.cloud/v1/surah');
@@ -134,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ارسم الواجهة
+    // UI Rendering
     function renderReciters() {
         recitersGridEl.innerHTML = recitersData.map(r => `
             <div class="reciter-card ${r.id === reciter.id ? 'active' : ''}" data-id="${r.id}">
@@ -189,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // شغل السورة واتحكم فيها
+    // Audio Logic & controls
     function playSurah(surah, index = -1) {
         if (index !== -1) curIdx = index;
         // console.log('Playing:', surah.name, 'with', reciter.name);
@@ -203,13 +201,14 @@ document.addEventListener('DOMContentLoaded', () => {
         playerReciter.textContent = reciter.name;
         playerImg.src = reciter.img;
 
-        // هل دي من المفضلات؟
+        // Check if favorite
         const isFav = favorites.includes(surah.number);
         favBtn.classList.toggle('active', isFav);
         favBtn.querySelector('i').className = isFav ? 'fas fa-heart' : 'far fa-heart';
 
         playerAudio.play();
-        // setupMediaSession(surah); // إعداد القائمة اللي بتظهر بره
+        // The player bar handles its own updates when the audio starts/stops
+        // setupMediaSession(surah); // We still need this to set metadata
         setupMediaSession(surah);
 
         checkDownloadStatus(audioUrl);
@@ -217,9 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function setupMediaSession(surah) {
-        // تحديث الميديا بره التطبيق
+        // Update Media Session for OS controls
         try {
-            // صورة شيك للقفل
+            // Branded artwork for lock screen
             const brandedArtworkUrl = await generateBrandedArtwork(reciter.img, reciter.name);
             const appIconUrl = new URL('images/icon-512x512.jpg', window.location.href).href;
 
@@ -233,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]
             });
 
-            // زراير التحكم بره
+            // Action Handlers
             navigator.mediaSession.setActionHandler('play', () => { playerAudio.play(); });
             navigator.mediaSession.setActionHandler('pause', () => { playerAudio.pause(); });
             navigator.mediaSession.setActionHandler('previoustrack', () => { playPrev(); });
@@ -250,14 +249,14 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
 
-            // تدرج ألوان ورا
+            // Background gradient
             const gradient = ctx.createLinearGradient(0, 0, 0, 512);
             gradient.addColorStop(0, '#1abc9c');
             gradient.addColorStop(1, '#16a085');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 512, 512);
 
-            // شوية نور
+            // Glow effect
             ctx.globalAlpha = 0.1;
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
@@ -265,21 +264,21 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fill();
             ctx.globalAlpha = 1.0;
 
-            // صورة القارئ
+            // Reciter photo
             const img = new Image();
-            // رابط كامل عشان ميعطلش
+            // Use absolute URL for canvas compatibility
             img.src = new URL(imgSrc, window.location.href).href;
             img.crossOrigin = "anonymous";
 
             img.onload = () => {
-                // برواز أبيض للصورة
+                // Draw white circle border for photo
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 10;
                 ctx.beginPath();
                 ctx.arc(256, 180, 110, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // قص الصورة وارسمها
+                // Clip and Draw Photo
                 ctx.save();
                 ctx.beginPath();
                 ctx.arc(256, 180, 105, 0, Math.PI * 2);
@@ -287,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.drawImage(img, 256 - 105, 180 - 105, 210, 210);
                 ctx.restore();
 
-                // اسم التطبيق
+                // App Name
                 ctx.fillStyle = '#ffffff';
                 ctx.textAlign = 'center';
                 ctx.font = '900 60px Tajawal, sans-serif';
@@ -295,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.shadowBlur = 15;
                 ctx.fillText('قرآني', 256, 380);
 
-                // اسم القارئ
+                // Reciter Name
                 ctx.font = '500 35px Tajawal, sans-serif';
                 ctx.shadowBlur = 0;
                 ctx.fillText(reciterName, 256, 440);
@@ -303,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 resolve(canvas.toDataURL('image/png'));
             };
             img.onerror = () => {
-                // لو باظت هات الصورة الأصلية
+                // Fallback to original image
                 resolve(new URL(imgSrc, window.location.href).href);
             };
         });
@@ -317,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function togglePlay() {
         if (curIdx === -1) {
-            // شغل الفاتحة لو مفيش حاجة
+            // Default to Al-Fatihah if none selected
             playSurah(surahs[0], 0);
             return;
         }
@@ -344,14 +343,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // حوارات البحث
+    // Serach Logic stuff
     function normalizeArabic(text) {
         if (!text) return "";
         return text
-            .replace(/[\u064B-\u0652]/g, "") // شيل التشكيل
-            .replace(/[أإآ]/g, "ا")         // وحد الالف
-            .replace(/ة/g, "ه")             // وحد اله
-            .replace(/ى/g, "ي");            // وحد الياء
+            .replace(/[\u064B-\u0652]/g, "") // Remove diacritics
+            .replace(/[أإآ]/g, "ا")         // Normalize Alef
+            .replace(/ة/g, "ه")             // Normalize Teh Marbuta
+            .replace(/ى/g, "ي");            // Normalize Alef Maksura
     }
 
     function handleSearch(query) {
@@ -368,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
             renderSurahs(filtered);
         } else {
-            // استنى شوية قبل ما تبحث
+            // Search debounce
             searchDebounceTimer = setTimeout(() => {
                 handleAyahSearch(query);
             }, 600);
@@ -379,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (query.length < 3) return;
         surahListEl.innerHTML = '<div class="loader">جاري البحث في الآيات...</div>';
         try {
-            // بحث بسيط من غير تشكيل
+            // Search simple text (no diacritics)
             const response = await fetch(`https://api.alquran.cloud/v1/search/${query}/all/quran-simple`);
             const data = await response.json();
 
@@ -431,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
                         `).join(' ');
 
-                        // انزل للآية اللي طلبها
+                        // Scroll to the specific ayah
                         const targetAyah = document.getElementById(`ayah-${ayahNum}`);
                         if (targetAyah) {
                             targetAyah.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -448,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // تتبع القراية وانت نازل
+    // scroll tracking setup
     function setupReadingObserver(surahNumber) {
         if (readingObserver) {
             readingObserver.disconnect();
@@ -462,12 +461,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }, {
-            root: ayahViewer, // قيس جوه القارئ بس
-            rootMargin: '-20% 0px -20% 0px', // خليك في النص
+            root: ayahViewer, // Tracks within viewer context
+            rootMargin: '-20% 0px -20% 0px', // Focus middle of viewport
             threshold: 0
         });
 
-        // استنى الثبات قبل ما تبدأ
+        // Delay observation for layout stability
         setTimeout(() => {
             document.querySelectorAll('.ayah-txt').forEach(el => {
                 readingObserver.observe(el);
@@ -475,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 
-    // أدوات وإعدادات
+    // Utils & Prefs
     function applyTheme() {
         const isDark = localStorage.getItem('theme') === 'dark';
         themeSwitch.checked = isDark;
@@ -484,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateMetaThemeColor(isDark) {
-        // غير لونه فوق في الموبايل
+        // Update status bar for mobile browsers
         const themeColor = isDark ? '#0f172a' : '#ffffff';
         const metaThemeColor = document.querySelector('meta[name="theme-color"]');
         if (metaThemeColor) {
@@ -493,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateFavoritesUI() {
-        // حدث صفحة المفضلات لو مفتوحة
+        // Refresh Favorites tab if active
         const activeTab = document.querySelector('.nav-item.active').dataset.target;
         if (activeTab === 'favorites') {
             const favSurahs = surahs.filter(s => favorites.includes(s.number));
@@ -510,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Default Salawat reminder
         icon.className = 'fas fa-heart';
-        if (iconContainer) iconContainer.style.color = ''; // صفر لون القلب
+        if (iconContainer) iconContainer.style.color = ''; // Reset heart color
         title.style.color = 'var(--primary-color)';
         title.textContent = '🤍صلى على اشرف الخلق🤍';
         text.textContent = 'صلى عليه وخد حسنات وادعيلي';
@@ -520,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSalawatModal() {
         updateSalawatContent();
 
-        // أظهرها علطول
+        // Show immediately
         salawatModal.style.display = 'flex';
         setTimeout(() => {
             salawatModal.classList.add('show');
@@ -543,20 +542,20 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
     }
 
-    // كل ٥ دقائق فكره بالصلاة على النبي
+    // Salawat interval (5 min)
     setInterval(() => {
         if (salawatModal.style.display !== 'flex') {
             showSalawatModal();
         }
     }, 5 * 60 * 1000);
 
-    // أحداث الواجهة
+    // UI Events
     function setupEventListeners() {
         playBtn.addEventListener('click', togglePlay);
         nextBtn.addEventListener('click', playNext);
         prevBtn.addEventListener('click', playPrev);
 
-        // تحديث شريط التقدم
+        // Audio progress update
         playerAudio.addEventListener('timeupdate', (e) => {
             const { currentTime, duration } = e.target;
             const progressPercent = (currentTime / duration) * 100;
@@ -565,13 +564,13 @@ document.addEventListener('DOMContentLoaded', () => {
             currentTimeEl.textContent = formatTime(currentTime);
             if (duration) durationEl.textContent = formatTime(duration);
 
-            // سيف الحالة كل ٥ ثواني
+            // Save state every 5s plugin
             if (Math.floor(currentTime) % 5 === 0) {
                 savePlaybackState();
             }
         });
 
-        // ظبط الواجهة مع تشغيل الصوت
+        // Sync UI with audio stat
         playerAudio.addEventListener('play', () => {
             isPlaying = true;
             updatePlayBtn();
@@ -625,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateMetaThemeColor(isDark);
         });
 
-        // التنقل بين الصفحات
+        // Tab navigation logic
         navItems.forEach(item => {
             item.addEventListener('click', () => {
                 navItems.forEach(i => i.classList.remove('active'));
@@ -668,7 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // التنقل للأقسام
+        // Sections Navigation
         document.getElementById('athkar-btn')?.addEventListener('click', () => {
             othersSection.style.display = 'none';
             athkarView.style.display = 'block';
@@ -686,7 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
             duaTextEl.textContent = getDuaOfTheDay();
         });
 
-        // زراير الرجوع
+        // Back buttons functionality
         document.getElementById('athkar-back')?.addEventListener('click', () => {
             athkarView.style.display = 'none';
             othersSection.style.display = 'block';
@@ -716,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // حوارات السبحة
+        // Rosary Logic
         if (rosaryBtn) {
             rosaryBtn.addEventListener('click', () => {
                 if (othersSection) othersSection.style.display = 'none';
@@ -724,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // حفظ العدادات
+        // Counters Persistence
         const rosaryCountKey = 'quran_rosary_count';
         let rosaryCount = parseInt(localStorage.getItem(rosaryCountKey)) || 0;
         if (rosaryCountEl) rosaryCountEl.textContent = rosaryCount;
@@ -761,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // تبديل أنواع الأذكار
+        // Athkar category switching
         document.querySelectorAll('.athkar-categories button').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.athkar-categories button').forEach(b => b.classList.remove('active'));
@@ -770,7 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // إضافة أو شيل من المفضلة
+        // Favorites toggle
         favBtn.addEventListener('click', () => {
             if (curIdx === -1) return;
             const surahNumber = surahs[curIdx].number;
@@ -786,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateFavoritesUI();
         });
 
-        // فتح نص الآيات
+        // Ayah text viewer entry point
         showTextBtn.addEventListener('click', async () => {
             if (curIdx === -1) return;
             const surah = surahs[curIdx];
@@ -837,7 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // مؤقت النوم عشان يطفي لوحده
+        // Setting up the sleep timer so the audio stops by itself while you sleep
         sleepTimerBtn.addEventListener('click', () => {
             timerModal.style.display = 'flex';
         });
@@ -868,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
 
-        // حوار التنبيه بالصلاة على النبي
+        // Handling the popup reminder for blessings
         closeSalawat.addEventListener('click', () => {
             salawatModal.classList.remove('show');
             setTimeout(() => { salawatModal.style.display = 'none'; }, 400);
@@ -929,16 +928,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayPrayerTimes(data) {
-        prayersTimings = data.timings; // شيل المواعيد عشان نحتاجها
+        prayersTimings = data.timings; // Saving these so we know when to send notifications if needed
         const timings = data.timings;
         const date = data.date;
 
-        // تحديث التاريخ والمكان
+        // Refreshing the date and location info on the screen
         prayerGregorianDate.textContent = date.gregorian.date;
         prayerHijriDate.textContent = `${date.hijri.day} ${date.hijri.month.ar} ${date.hijri.year}`;
         prayerLocation.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${data.meta.timezone}`;
 
-        // بنعرض الخمس صلوات والشروق بس
+        // We only show the main 5 prayers plus Sunrise, with clear Arabic names and icons
         const prayers = [
             { key: 'Fajr', name: 'الفجر', icon: 'fa-cloud-sun' },
             { key: 'Sunrise', name: 'الشروق', icon: 'fa-sun' },
@@ -948,7 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { key: 'Isha', name: 'العشاء', icon: 'fa-moon' }
         ];
 
-        // رص مواعيد الصلاة
+        // Building the list of prayer times to display
         prayerTimesList.innerHTML = prayers.map(p => {
             return `
                 <div class="prayer-item" id="prayer-${p.key}">
@@ -967,7 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const m = minutes;
         const ampm = h >= 12 ? 'م' : 'ص';
         h = h % 12;
-        h = h ? h : 12; // الساعة صفر يعني ١٢
+        h = h ? h : 12; // the hour '0' should be '12'
         return `${h}:${m} ${ampm}`;
     }
 
@@ -999,7 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // لو الصلاة خلصت يبقى الفجر بكرة
+        // If no next prayer found today, it means next is Fajr tomorrow
         if (!nextPrayer) nextPrayer = 'Fajr';
 
         const el = document.getElementById(`prayer-${nextPrayer}`);
@@ -1015,7 +1014,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return duasData[index];
     }
 
-    // --- هات التفسير والمعاني ---
+    // --- Getting detailed explanations and meanings of the verses ---
     async function showTafsir(surahNum, ayahNum) {
         activeTafsirSurah = surahNum;
         activeTafsirAyah = ayahNum;
@@ -1044,7 +1043,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- أدوات مساعدة رفيعة ---
+    // --- Handy little helper functions used throughout the code ---
     function formatTime(seconds) {
         if (isNaN(seconds)) return '00:00';
         const min = Math.floor(seconds / 60);
@@ -1052,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
     }
 
-    // --- حفظ الداتا عشان ميوحشوش ---
+    // --- Saving and loading data locally so you don't lose progress ---
     function savePlaybackState() {
         if (curIdx === -1) return;
         const state = {
@@ -1063,15 +1062,15 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('quran_last_play', JSON.stringify(state));
     }
 
-    // --- تحميل السور عشان تشتغل أوفلاين ---
+    // --- Letting you download audio files so you can listen without internet ---
     async function checkDownloadStatus(url) {
         if (!downloadBtn) return;
 
-        // رجع الزرار لشكلة الأول
+        // Put the button back to its starting look before checking the status
         downloadBtn.className = 'download-btn';
         downloadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i>';
         downloadBtn.title = 'تحميل السورة';
-        downloadBtn.onclick = null; // شيل أي أحداث قديمة
+        downloadBtn.onclick = null; // Remove any old click actions to avoid confusion
 
         try {
             const cache = await caches.open('quran-audio-v1');
@@ -1081,7 +1080,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 downloadBtn.classList.add('downloaded');
                 downloadBtn.innerHTML = '<i class="fas fa-check"></i>';
                 downloadBtn.title = 'تم التحميل (متاح بدون انترنت)';
-                // لو متحملة، الزرار يمسحها
+                // If it's already on the device, clicking the button lets you delete it instead
                 downloadBtn.onclick = async () => {
                     if (confirm('هل تريد حذف السورة من التحميلات؟')) {
                         await cache.delete(url);
@@ -1099,18 +1098,18 @@ document.addEventListener('DOMContentLoaded', () => {
     async function downloadSurah(url) {
         if (!downloadBtn) return;
 
-        // أظهر علامة التحميل
+        // Show a spinning icon while the download is in progress
         downloadBtn.className = 'download-btn downloading';
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         try {
             const cache = await caches.open('quran-audio-v1');
 
-            // حمل الملف كامل وسيفه
+            // We'll just download the whole file and stick it in the browser's permanent stash
 
             await cache.add(url);
 
-            // حدث الزرار لما يخلص
+            // Refresh the button icon once everything is finished successfully
             checkDownloadStatus(url);
 
         } catch (error) {
@@ -1138,56 +1137,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const formattedNumber = String(surah.number).padStart(3, '0');
                     playerAudio.src = `${reciter.server}${formattedNumber}.mp3`;
 
-                    // ابدأ مطرح ما وقفت بالظبط
+                    // Start exactly from the minute and second where you last stopped
                     playerAudio.addEventListener('loadedmetadata', () => {
                         playerAudio.currentTime = lastPlay.currentTime || 0;
                     }, { once: true });
 
-                    // ظبط الزرار والحاجة مع السورة
+                    // Make sure the download button and everything else matches the current track
                     checkDownloadStatus(playerAudio.src);
                     renderReciters();
                     renderSurahs(surahs);
                 }
             }
-        }
-    }
-
-    function handleDeepLink() {
-        const hash = window.location.hash;
-        if (!hash) return;
-
-        // صفر كل القوائم
-        document.getElementById('content-area').style.display = 'none';
-        document.getElementById('ai-section').style.display = 'none';
-        if (othersSection) othersSection.style.display = 'none';
-        if (athkarView) athkarView.style.display = 'none';
-        if (aboutView) aboutView.style.display = 'none';
-        if (duaView) duaView.style.display = 'none';
-        if (rosaryView) rosaryView.style.display = 'none';
-        if (prayerView) prayerView.style.display = 'none';
-        playerBar.style.display = 'none';
-
-        if (hash === '#prayer' || hash === '#rosary') {
-            navItems.forEach(i => i.classList.remove('active'));
-            const othersNav = Array.from(navItems).find(i => i.dataset.target === 'others');
-            if (othersNav) othersNav.classList.add('active');
-        }
-
-        if (hash === '#prayer') {
-            if (prayerView) {
-                prayerView.style.display = 'block';
-                fetchPrayerTimes();
-            }
-        } else if (hash === '#rosary') {
-            if (rosaryView) {
-                rosaryView.style.display = 'block';
-            }
-        } else if (hash === '#home') {
-            document.getElementById('content-area').style.display = 'block';
-            playerBar.style.display = 'flex';
-            navItems.forEach(i => i.classList.remove('active'));
-            const homeNav = Array.from(navItems).find(i => i.dataset.target === 'home');
-            if (homeNav) homeNav.classList.add('active');
         }
     }
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 
-<!-- حتة جوجل لتحليل الموقع -->
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E6FX97WVER"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -15,7 +15,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <!-- كلمات البحث والـ SEO -->
+    <!-- SEO Meta Tags -->
     <title>قرآني | سماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء</title>
     <meta name="title" content="قرآني - تجربة إيمانية متكاملة لسماع القرآن الكريم">
     <meta name="description"
@@ -25,7 +25,7 @@
     <meta name="author" content="عاصم محمد كمال ابو النصر">
     <link rel="canonical" href="https://ralball74.github.io/qurany.assem/">
 
-    <!-- حوارات السوشيال ميديا وصورة اللينك -->
+    <!-- Open Graph / Facebook / Messenger -->
     <meta property="fb:app_id" content="">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ralball74.github.io/qurany.assem/">
@@ -41,7 +41,7 @@
     <meta property="og:image:height" content="512">
     <meta property="og:image:alt" content="لوجو تطبيق قرآني">
 
-    <!-- تويتر -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://ralball74.github.io/qurany.assem/">
     <meta name="twitter:title" content="تطبيق قرآني - تجربة إيمانية متكاملة">
@@ -50,10 +50,10 @@
     <meta name="twitter:image" content="https://ralball74.github.io/qurany.assem/images/icon-512x512.jpg">
     <meta name="twitter:image:alt" content="لوجو تطبيق قرآني">
 
-    <!-- واتساب وأبل -->
+    <!-- WhatsApp / Apple -->
     <link rel="apple-touch-icon" href="images/icon-192x192.png">
 
-    <!-- بيانات منظمة لجوجل -->
+    <!-- Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -71,7 +71,7 @@
     </script>
 
     <link rel="stylesheet" href="others/style.css">
-    <!-- خطوط جوجل -->
+    <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap"
         rel="stylesheet">
@@ -80,13 +80,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-    <!-- أيقونات Font Awesome -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body class="light-mode">
     <div class="app-container">
-        <!-- اللوجو والبحث فوق -->
+        <!-- Header & Search -->
         <header class="top-header">
             <div class="header-top">
                 <div class="logo">
@@ -118,24 +118,24 @@
             </div>
         </header>
 
-        <!-- تنبيه لو مفيش نت -->
+        <!-- Offline Banner -->
         <div id="offline-banner" class="offline-banner" style="display: none;">
             <i class="fas fa-wifi-slash"></i>
             <span>لا يوجد اتصال بالإنترنت - تعمل فقط السور المحملة</span>
         </div>
 
-        <!-- المحتوى الرئيسي -->
+        <!-- Main Content -->
         <main class="main-content">
             <section id="content-area" class="content-scroll">
-                <!-- قسم القراء -->
+                <!-- Reciters Section -->
                 <div class="section-header">
                     <h2>القراء</h2>
                 </div>
                 <div id="reciters-grid" class="reciters-carousel">
-                    <!-- كروت القراء بتترص هنا بالـ JS -->
+                    <!-- Reciter cards will be added here via JavaScript -->
                 </div>
 
-                <!-- قائمة السور -->
+                <!-- Surah List -->
                 <div class="section-header">
                     <h2 id="current-category">السور</h2>
                 </div>
@@ -144,7 +144,7 @@
                 </div>
             </section>
 
-            <!-- المساعد الذكي -->
+            <!-- AI Assistant -->
             <section id="ai-section" class="ai-view" style="display: none;">
                 <div class="ai-header">
                     <h2>مساعدك الذكي</h2>
@@ -170,7 +170,7 @@
                 </div>
             </section>
 
-            <!-- أدوات إضافية -->
+            <!-- Extra Tools -->
             <section id="others-section" class="others-view" style="display: none;">
                 <div class="section-header">
                     <h2>أخرى</h2>
@@ -215,7 +215,7 @@
                 </div>
             </section>
 
-            <!-- عن المطور -->
+            <!-- About Developer -->
             <section id="about-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="about-back"><i class="fas fa-arrow-right"></i></button>
@@ -240,7 +240,7 @@
                 </div>
             </section>
 
-            <!-- دعاء اليوم -->
+            <!-- Daily Dua -->
             <section id="dua-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="dua-back"><i class="fas fa-arrow-right"></i></button>
@@ -251,7 +251,7 @@
                 </div>
             </section>
 
-            <!-- السبحة الإلكترونية -->
+            <!-- E-Rosary -->
             <section id="rosary-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="rosary-back"><i class="fas fa-arrow-right"></i></button>
@@ -272,7 +272,7 @@
                 </div>
             </section>
 
-            <!-- مواقيت الصلاة -->
+            <!-- Prayer Times -->
             <section id="prayer-view" class="others-subview" style="display: none;">
                 <div class="view-header">
                     <button class="back-btn" id="prayer-back"><i class="fas fa-arrow-right"></i></button>
@@ -293,7 +293,7 @@
             </section>
 
 
-            <!-- عرض الآيات -->
+            <!-- Ayah Viewer -->
             <div id="ayah-viewer" class="ayah-viewer">
                 <div class="ayah-header">
                     <h3 id="viewer-title">سورة الفاتحة</h3>
@@ -304,9 +304,9 @@
             </div>
         </main>
 
-        <!-- بار المشغل تحت -->
+        <!-- Player Bar -->
         <footer class="player-bar">
-            <!-- بيانات السورة والتحكم -->
+            <!-- Surah info & actions -->
             <div class="song-info">
                 <div class="info-left">
                     <img src="images/4.jpg" alt="صورة القارئ - تطبيق قرآني" id="player-img">
@@ -324,7 +324,7 @@
                 </div>
             </div>
 
-            <!-- زراير التحكم -->
+            <!-- Player Controls -->
             <div class="player-controls">
                 <div class="progress-area">
                     <span id="current-time" class="time-label">00:00</span>
@@ -341,7 +341,7 @@
             </div>
         </footer>
 
-        <!-- المنيو تحت -->
+        <!-- Navigation Menu -->
         <nav class="sidebar">
             <div class="nav-menu">
                 <button class="nav-item active" data-target="home">
@@ -368,7 +368,7 @@
         </nav>
     </div>
 
-    <!-- بانر تثبيت التطبيق PWA -->
+    <!-- PWA Install Banner -->
     <div id="pwa-install-banner" class="pwa-install-banner" style="display:none;">
         <div class="pwa-install-content">
             <div class="pwa-icon-wrap">
@@ -390,7 +390,7 @@
         </div>
     </div>
 
-    <!-- تنبيه الصلاة على النبي -->
+    <!-- Salawat Reminder -->
     <div id="salawat-modal" class="modal salawat-modal">
         <div class="modal-content salawat-content">
             <div class="salawat-icon" id="salawat-icon-container">
@@ -402,7 +402,7 @@
         </div>
     </div>
 
-    <!-- مؤقت النوم -->
+    <!-- Sleep Timer -->
     <div id="timer-modal" class="modal">
         <div class="modal-content">
             <h3>مؤقت النوم</h3>
@@ -416,7 +416,7 @@
         </div>
     </div>
 
-    <!-- مودال التفسير -->
+    <!-- Tafsir Modal -->
     <div id="tafsir-modal" class="modal">
         <div class="modal-content tafsir-content">
             <div class="tafsir-header">
@@ -452,12 +452,12 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(reg => {
-                    // التشكيك في تحديث الـ SW
+                    // Check for SW updates
                     reg.update();
                 });
             });
 
-            // ري لود لو فيه تغيير
+            // Reload on controller change
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (!refreshing) {
@@ -467,7 +467,7 @@
             });
         }
 
-        // لوجيك تثبيت الـ PWA
+        // PWA Install Logic
         let deferredPrompt;
         const pwaInstallBanner = document.getElementById('pwa-install-banner');
         const pwaInstallBtn = document.getElementById('pwa-install-btn');
@@ -477,7 +477,7 @@
             e.preventDefault();
             deferredPrompt = e;
 
-            // أظهر البانر لو مكنش مغلق
+            // Show banner if not dismissed
             const dismissed = localStorage.getItem('pwa-install-dismissed');
             if (!dismissed) {
                 setTimeout(() => {
@@ -504,7 +504,7 @@
             setTimeout(() => { pwaInstallBanner.style.display = 'none'; }, 400);
         });
 
-        // اخفيه عند التثبيت
+        // Hide on install
         window.addEventListener('appinstalled', () => {
             pwaInstallBanner.classList.remove('visible');
             setTimeout(() => { pwaInstallBanner.style.display = 'none'; }, 400);

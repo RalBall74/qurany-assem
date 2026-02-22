@@ -26,31 +26,6 @@
             "type": "image/jpeg",
             "purpose": "any maskable"
         }
-    ],
-    "shortcuts": [
-        {
-            "name": "مواقيت الصلاة",
-            "short_name": "المواقيت",
-            "description": "عرض مواقيت الصلاة لليوم",
-            "url": "../#prayer",
-            "icons": [
-                {
-                    "src": "../images/icon-192x192.png",
-                    "sizes": "192x192"
-                }
-            ]
-        },
-        {
-            "name": "السبحة الإلكترونية",
-            "short_name": "السبحة",
-            "description": "فتح السبحة الإلكترونية للتسبيح",
-            "url": "../#rosary",
-            "icons": [
-                {
-                    "src": "../images/icon-192x192.png",
-                    "sizes": "192x192"
-                }
-            ]
-        }
     ]
+
 }
