@@ -731,13 +731,11 @@ body.dark-mode .app-copyright {
 
 .nav-item.active {
     color: var(--primary-color);
-    gap: 1px;
-    /* Less distance between icon and text when active */
+    gap: 1.5px;
 }
 
 .nav-item.active i {
-    transform: translateY(-3px);
-    /* Slightly less lift to keep it compact */
+    transform: translateY(-2px);
 }
 
 .nav-item::after {
@@ -2631,8 +2629,7 @@ input:checked+.toggle-slider:before {
 }
 
 .nav-item.active .modern-ai-icon-container {
-    transform: translateY(-3px);
-    /* Match the other icons */
+    transform: translateY(-2px);
     color: var(--primary-color);
 }
 
