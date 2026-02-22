@@ -1225,21 +1225,23 @@ body.dark-mode .ai-message .message-content {
     left: 0;
     width: 100%;
     padding: 1rem;
-    background: var(--sidebar-light);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
     gap: 10px;
     align-items: center;
     z-index: 50;
     padding-bottom: 120px;
-    /* To be above the sidebar nav which is fixed */
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.8);
+    /* Glassmorphism Effect */
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
 }
 
 body.dark-mode .chat-input-area {
-    background: rgba(30, 41, 59, 0.9);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .chat-input-wrapper {
@@ -1247,17 +1249,18 @@ body.dark-mode .chat-input-area {
     position: relative;
     display: flex;
     align-items: center;
-    background: rgba(127, 140, 141, 0.1);
+    background: rgba(127, 140, 141, 0.08);
     border-radius: 25px;
     padding: 5px 15px;
-    border: 1px solid transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
 .chat-input-wrapper:focus-within {
     border-color: var(--primary-color);
-    background: var(--card-light);
-    box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 20px rgba(26, 188, 156, 0.15);
 }
 
 body.dark-mode .chat-input-wrapper:focus-within {
