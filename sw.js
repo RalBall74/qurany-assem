@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-app-v3'; // Bump this number whenever you want to force the browser to update its local files
+const CACHE_NAME = 'quran-app-v2'; // Bump this number whenever you want to force the browser to update its local files
 const AUDIO_CACHE_NAME = 'quran-audio-v1';
 
 self.addEventListener("install", event => {
