@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
         applyTheme();
         updateFavoritesUI();
-        showSalawatModal('ramadan');
         if (tafsirEngineSelect) tafsirEngineSelect.value = currentTafsirEdition;
 
         // Set default reciter if nothing is playing
@@ -501,42 +500,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateSalawatContent(type) {
+    function updateSalawatContent() {
         const icon = document.getElementById('salawat-icon');
         const iconContainer = document.getElementById('salawat-icon-container');
         const title = document.getElementById('salawat-title');
         const text = document.getElementById('salawat-text');
         const btn = document.getElementById('close-salawat');
 
-        if (type === 'ramadan') {
-            // Ramadan mode styling
-            icon.className = 'fas fa-moon';
-            if (iconContainer) iconContainer.style.color = '#f1c40f'; // Gold crescent
-            title.style.color = '#e67e22'; // Warm orange greeting
-            title.textContent = '🌙 رمضان مبارك 🌙';
-            text.textContent = 'حاول ان تكون نسخة افضل من نفسك في رمضان';
-            btn.textContent = 'مبارك علينا وعليكم';
-        } else {
-            // Default Salawat reminder
-            icon.className = 'fas fa-heart';
-            if (iconContainer) iconContainer.style.color = ''; // Reset heart color
-            title.style.color = 'var(--primary-color)';
-            title.textContent = '🤍صلى على اشرف الخلق🤍';
-            text.textContent = 'صلى عليه وخد حسنات وادعيلي';
-            btn.textContent = 'عليه الصلاة والسلام';
-        }
+        // Default Salawat reminder
+        icon.className = 'fas fa-heart';
+        if (iconContainer) iconContainer.style.color = ''; // Reset heart color
+        title.style.color = 'var(--primary-color)';
+        title.textContent = '🤍صلى على اشرف الخلق🤍';
+        text.textContent = 'صلى عليه وخد حسنات وادعيلي';
+        btn.textContent = 'عليه الصلاة والسلام';
     }
 
-    function showSalawatModal(type = 'salawat') {
-        updateSalawatContent(type);
+    function showSalawatModal() {
+        updateSalawatContent();
 
-        // Show with delay for Ramadan mode
+        // Show immediately
+        salawatModal.style.display = 'flex';
         setTimeout(() => {
-            salawatModal.style.display = 'flex';
-            setTimeout(() => {
-                salawatModal.classList.add('show');
-            }, 10);
-        }, type === 'ramadan' ? 500 : 0);
+            salawatModal.classList.add('show');
+        }, 10);
     }
 
     function renderAthkar(category) {
@@ -558,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Salawat interval (5 min)
     setInterval(() => {
         if (salawatModal.style.display !== 'flex') {
-            showSalawatModal('salawat');
+            showSalawatModal();
         }
     }, 5 * 60 * 1000);
 
