@@ -94,10 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
             playerImg.src = reciter.img;
         }
 
-        // Status monitoring
         updateOnlineStatus();
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
+
+        // Handle navigation from shortcuts or direct links
+        handleDeepLink();
     }
 
     function updateOnlineStatus() {
@@ -1148,6 +1150,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderSurahs(surahs);
                 }
             }
+        }
+    }
+
+    function handleDeepLink() {
+        const hash = window.location.hash;
+        if (!hash) return;
+
+        // Reset all views
+        document.getElementById('content-area').style.display = 'none';
+        document.getElementById('ai-section').style.display = 'none';
+        if (othersSection) othersSection.style.display = 'none';
+        if (athkarView) athkarView.style.display = 'none';
+        if (aboutView) aboutView.style.display = 'none';
+        if (duaView) duaView.style.display = 'none';
+        if (rosaryView) rosaryView.style.display = 'none';
+        if (prayerView) prayerView.style.display = 'none';
+        playerBar.style.display = 'none';
+
+        if (hash === '#prayer' || hash === '#rosary') {
+            navItems.forEach(i => i.classList.remove('active'));
+            const othersNav = Array.from(navItems).find(i => i.dataset.target === 'others');
+            if (othersNav) othersNav.classList.add('active');
+        }
+
+        if (hash === '#prayer') {
+            if (prayerView) {
+                prayerView.style.display = 'block';
+                fetchPrayerTimes();
+            }
+        } else if (hash === '#rosary') {
+            if (rosaryView) {
+                rosaryView.style.display = 'block';
+            }
+        } else if (hash === '#home') {
+            document.getElementById('content-area').style.display = 'block';
+            playerBar.style.display = 'flex';
+            navItems.forEach(i => i.classList.remove('active'));
+            const homeNav = Array.from(navItems).find(i => i.dataset.target === 'home');
+            if (homeNav) homeNav.classList.add('active');
         }
     }
 

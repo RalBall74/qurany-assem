@@ -26,6 +26,67 @@
             "type": "image/jpeg",
             "purpose": "any maskable"
         }
+    ],
+    "shortcuts": [
+        {
+            "name": "مواقيت الصلاة",
+            "short_name": "المواقيت",
+            "description": "عرض مواقيت الصلاة لليوم",
+            "url": "index.html#prayer",
+            "icons": [
+                {
+                    "src": "../images/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "السبحة الإلكترونية",
+            "short_name": "السبحة",
+            "description": "فتح السبحة الإلكترونية للتسبيح",
+            "url": "index.html#rosary",
+            "icons": [
+                {
+                    "src": "../images/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "widgets": [
+        {
+            "name": "مواقيت الصلاة",
+            "short_name": "الصلاة",
+            "description": "عرض الصلاة القادمة والوقت المتبقي",
+            "tag": "prayer",
+            "ms_definition": {
+                "template": "prayer-widget.html",
+                "type": "text/html"
+            },
+            "icons": [
+                {
+                    "src": "../images/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "السبحة",
+            "short_name": "السبحة",
+            "description": "عداد التسبيح السريع",
+            "tag": "rosary",
+            "ms_definition": {
+                "template": "rosary-widget.html",
+                "type": "text/html"
+            },
+            "icons": [
+                {
+                    "src": "../images/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
     ]
-
 }
