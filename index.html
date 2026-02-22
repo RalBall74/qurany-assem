@@ -152,7 +152,12 @@
                 </div>
                 <div id="chat-container" class="chat-container">
                     <div class="message ai-message">
-                        <div class="message-avatar"><i class="fas fa-wand-magic-sparkles"></i></div>
+                        <div class="message-avatar">
+                            <div class="modern-ai-icon-container">
+                                <div class="ai-icon-glow"></div>
+                                <div class="ai-icon-sparkle"></div>
+                            </div>
+                        </div>
                         <div class="message-content">مرحباً! أنا مساعدك الذكي المعتمد على Gemini. كيف يمكنني مساعدتك في
                             رحلتك القرآنية اليوم؟</div>
                     </div>
@@ -161,7 +166,7 @@
                     <div class="chat-input-wrapper">
                         <input type="text" id="ai-input" placeholder="اكتب سؤالك هنا..." autocomplete="off">
                     </div>
-                    <button id="send-ai-btn" disabled><i class="fas fa-paper-plane"></i></button>
+                    <button id="send-ai-btn" disabled><i class="fas fa-arrow-left"></i></button>
                 </div>
             </section>
 
@@ -348,7 +353,10 @@
                     <span>المفضلة</span>
                 </button>
                 <button class="nav-item" data-target="ai">
-                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <div class="modern-ai-icon-container">
+                        <div class="ai-icon-glow"></div>
+                        <div class="ai-icon-sparkle"></div>
+                    </div>
                     <span>المساعد</span>
                 </button>
                 <button class="nav-item" data-target="others">

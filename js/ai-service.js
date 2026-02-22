@@ -131,7 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
-        avatar.innerHTML = role === 'ai' ? '<i class="fas fa-wand-magic-sparkles"></i>' : '<i class="fas fa-user"></i>';
+        avatar.innerHTML = role === 'ai' ? `
+            <div class="modern-ai-icon-container">
+                <div class="ai-icon-glow"></div>
+                <div class="ai-icon-sparkle"></div>
+            </div>` : '<i class="fas fa-user"></i>';
 
         const content = document.createElement('div');
         content.className = 'message-content';
@@ -152,7 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
-        avatar.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i>';
+        avatar.innerHTML = `
+            <div class="modern-ai-icon-container">
+                <div class="ai-icon-glow"></div>
+                <div class="ai-icon-sparkle"></div>
+            </div>`;
 
         const content = document.createElement('div');
         content.className = 'message-content';
