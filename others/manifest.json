@@ -1,0 +1,31 @@
+{
+    "name": "Qurany",
+    "short_name": "Qurany",
+    "description": "تطبيق متكامل لاستماع القرآن الكريم بأصوات مشاهير القراء مع ميزات ذكية",
+    "start_url": "../index.html",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "lang": "ar",
+    "dir": "rtl",
+    "categories": [
+        "lifestyle",
+        "education"
+    ],
+    "icons": [
+        {
+            "src": "../images/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "../images/icon-512x512.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg",
+            "purpose": "any maskable"
+        }
+    ]
+
+}
