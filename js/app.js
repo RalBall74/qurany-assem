@@ -56,6 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const prayerHijriDate = document.getElementById('prayer-hijri-date');
     const prayerLocation = document.getElementById('prayer-location');
     const offlineBanner = document.getElementById('offline-banner');
+    const shareModal = document.getElementById('share-modal');
+    const closeShare = document.getElementById('close-share');
+    const shareCanvas = document.getElementById('share-canvas');
+    const sharePreview = document.getElementById('share-card-preview');
+    const downloadCardBtn = document.getElementById('download-card-btn');
+    const nativeShareBtn = document.getElementById('native-share-btn');
 
 
     // حالة التطبيق والحاجات اللي بتتحفظ
@@ -427,7 +433,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const ayahs = await fetchSurahText(surah.number);
                     if (ayahs) {
                         ayahContent.innerHTML = ayahs.map(a => `
-                            <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
+                            <div class="ayah-row">
+                                <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
+                                <div class="ayah-actions">
+                                    <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                </div>
+                            </div>
                         `).join(' ');
 
                         // روح للآية اللي بندور عليها بالظبط
@@ -794,7 +807,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ayahViewer.classList.add('active');
             const ayahs = await fetchSurahText(surah.number);
             if (ayahs) {
-                ayahContent.innerHTML = ayahs.map(a => `<span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>`).join(' ');
+                ayahContent.innerHTML = ayahs.map(a => `
+                    <div class="ayah-row">
+                        <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
+                        <div class="ayah-actions">
+                            <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+                    </div>
+                `).join(' ');
 
                 const savedPos = localStorage.getItem(`quran_read_pos_${surah.number}`);
                 if (savedPos) {
@@ -833,6 +855,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 tafsirModal.style.display = 'none';
                 activeTafsirSurah = null;
                 activeTafsirAyah = null;
+            }
+            if (e.target === shareModal) {
+                shareModal.style.display = 'none';
+            }
+        });
+
+        // لوجيك كروت المشاركة
+        ayahContent.addEventListener('click', (e) => {
+            const shareBtn = e.target.closest('.share-ayah-btn');
+            if (shareBtn) {
+                e.stopPropagation(); // عشان ما يفتحش التفسير بالصدفة
+                const data = {
+                    surah: shareBtn.dataset.surah,
+                    ayah: shareBtn.dataset.ayah,
+                    text: shareBtn.dataset.text
+                };
+                generateAyahCard(data);
+            }
+        });
+
+        closeShare.addEventListener('click', () => {
+            shareModal.style.display = 'none';
+        });
+
+        downloadCardBtn.addEventListener('click', () => {
+            const dataUrl = shareCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `qurany-ayah-${Date.now()}.png`;
+            link.href = dataUrl;
+            link.click();
+        });
+
+        nativeShareBtn.addEventListener('click', async () => {
+            const dataUrl = shareCanvas.toDataURL('image/png');
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
+            const file = new File([blob], 'ayah.png', { type: 'image/png' });
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'آية من القرآن الكريم',
+                        text: 'تطبيق قرآني - تجربة إيمانية متكاملة'
+                    });
+                } catch (err) {
+                    console.error('Share failed:', err);
+                }
+            } else {
+                alert('المشاركة غير مدعومة في متصفحك، يمكنك حفظ الصورة بدلاً من ذلك.');
             }
         });
 
@@ -1149,6 +1221,171 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+    }
+
+    // --- وظيفة توليد كارت الآية بشكل جمالي واحترافي على الـ Canvas ---
+    async function generateAyahCard(data) {
+        shareModal.style.display = 'flex';
+        sharePreview.innerHTML = '<div class="loader">جاري تجهيز الكارت...</div>';
+
+        const ctx = shareCanvas.getContext('2d');
+        const W = shareCanvas.width;
+        const H = shareCanvas.height;
+
+        // تحميل اللوجو أولاً
+        const logo = new Image();
+        logo.src = 'images/icon-512x512.jpg';
+        await new Promise(resolve => {
+            logo.onload = resolve;
+            logo.onerror = resolve;
+        });
+
+        // 1. خلفية داكنة وفخمة (Dark Navy Gradient)
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(1, '#1e293b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. إضافة زخارف إسلامية خفيفة في الخلفية
+        ctx.save();
+        ctx.globalAlpha = 0.05;
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2;
+        // رسم شبكة زخرفية بسيطة
+        for (let i = 0; i <= W; i += 120) {
+            for (let j = 0; j <= H; j += 120) {
+                ctx.beginPath();
+                ctx.arc(i, j, 40, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+        ctx.restore();
+
+        // 3. إطار ذهبي فخم
+        ctx.strokeStyle = '#d97706';
+        ctx.lineWidth = 15;
+        ctx.strokeRect(40, 40, W - 80, H - 80);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(60, 60, W - 120, H - 120);
+
+        // 4. وضع اللوجو في الأعلى بشكل دائري شيك
+        const logoSize = 120;
+        const logoY = 160;
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(W / 2, logoY, logoSize / 2 + 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.clip();
+        ctx.drawImage(logo, W / 2 - logoSize / 2, logoY - logoSize / 2, logoSize, logoSize);
+        ctx.restore();
+
+        // 5. اسم التطبيق
+        ctx.fillStyle = '#fbbf24';
+        ctx.textAlign = 'center';
+        ctx.font = '700 45px Tajawal, sans-serif';
+        ctx.fillText('تطبيق قرآني', W / 2, logoY + 110);
+
+        // 6. النص القرآني (الآية) مع خاصية الـ Auto-scaling لمنع التداخل
+        let fontSize = 85;
+        const maxWidth = W - 240;
+        const maxHeight = H - 650; // المساحة المتاحة للنص
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textBaseline = 'middle';
+
+        let lines = [];
+        // تقليل حجم الخط لو النص طويل جداً
+        do {
+            ctx.font = `700 ${fontSize}px Amiri, serif`;
+            lines = getWrappedLines(ctx, data.text, maxWidth);
+            if (lines.length * (fontSize * 1.6) <= maxHeight || fontSize <= 40) break;
+            fontSize -= 5;
+        } while (fontSize > 40);
+
+        const lineHeight = fontSize * 1.6;
+        const totalTextHeight = lines.length * lineHeight;
+        let startY = H / 2 - totalTextHeight / 2 + 50;
+
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 10;
+        ctx.direction = 'rtl'; // تأكيد الاتجاه من اليمين لليسار
+
+        lines.forEach((line, i) => {
+            // إضافة مسافة خفيفة بين الحروف لو فيه تداخل (letter-spacing مش متوفر في Canvas بسهولة بس بنعوضه بتباعد السطور)
+            ctx.fillText(line.trim(), W / 2, startY + (i * lineHeight));
+        });
+        ctx.shadowBlur = 0;
+        ctx.direction = 'inherit';
+
+        // 7. اسم السورة والآية (Metadata)
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '600 50px Tajawal, sans-serif';
+        // 7. اسم السورة والآية (Metadata)
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '600 50px Tajawal, sans-serif';
+
+        // تنظيف اسم السورة من أي تكرار لكلمة "سورة" (بما في ذلك التشكيل الشائع)
+        // بنشيل كلمة سورة في أول النص أو أي مكان ونضيفها إحنا باحترافية مرة واحدة
+        let cleanSurah = data.surah.replace(/سورة/g, '')
+            .replace(/سُورَةُ/g, '')
+            .replace(/سُورَةِ/g, '')
+            .replace(/سُورَةَ/g, '')
+            .trim();
+
+        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, H - 220);
+
+        // 8. الحقوق والرابط
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '300 30px Outfit, sans-serif';
+        ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 110);
+
+        // تحديث المعاينة بصورة عالية الجودة
+        const image = new Image();
+        image.src = shareCanvas.toDataURL('image/png', 1.0);
+        image.onload = () => {
+            sharePreview.innerHTML = '';
+            sharePreview.appendChild(image);
+        };
+    }
+
+    // دالة مساعدة لتقسيم النص لأسطر بشكل صحيح يدعم العربية
+    function getWrappedLines(ctx, text, maxWidth) {
+        const words = text.trim().split(/\s+/);
+        let lines = [];
+        let currentLine = words[0];
+
+        for (let i = 1; i < words.length; i++) {
+            let word = words[i];
+            let width = ctx.measureText(currentLine + ' ' + word).width;
+            if (width < maxWidth) {
+                currentLine += ' ' + word;
+            } else {
+                lines.push(currentLine);
+                currentLine = word;
+            }
+        }
+        lines.push(currentLine);
+        return lines;
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
     }
 
 });
