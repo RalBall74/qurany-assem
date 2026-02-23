@@ -1290,32 +1290,36 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText('تطبيق قرآني', W / 2, logoY + 110);
 
         // 6. النص القرآني (الآية) مع خاصية الـ Auto-scaling لمنع التداخل
-        let fontSize = 85;
-        const maxWidth = W - 240;
-        const maxHeight = H - 650; // المساحة المتاحة للنص
+        // بنحاول نظبط حجم الخط بحيث يناسب المساحة المتاحة مهما كان طول الآية
+        let fontSize = 80;
+        const maxWidth = W - 200;
+        const maxHeight = 500; // أقصى ارتفاع مسموح به للنص عشان ما يلمسش الهيدر أو الفوتر
 
         ctx.fillStyle = '#ffffff';
         ctx.textBaseline = 'middle';
 
         let lines = [];
-        // تقليل حجم الخط لو النص طويل جداً
-        do {
+        // بنقلل حجم الخط بالتدريج لحد ما النص يدخل في المساحة المتاحة أو نوصل لأقل حجم مسموح (25 بكسل)
+        while (fontSize >= 25) {
             ctx.font = `700 ${fontSize}px Amiri, serif`;
             lines = getWrappedLines(ctx, data.text, maxWidth);
-            if (lines.length * (fontSize * 1.6) <= maxHeight || fontSize <= 40) break;
-            fontSize -= 5;
-        } while (fontSize > 40);
+            const totalH = lines.length * (fontSize * 1.5);
+            if (totalH <= maxHeight || fontSize <= 25) break;
+            fontSize -= 2; // تقليل تدريجي بمقدار بسيط عشان نوصل لأفضل حجم ممكن
+        }
 
-        const lineHeight = fontSize * 1.6;
+        const lineHeight = fontSize * 1.5;
         const totalTextHeight = lines.length * lineHeight;
-        let startY = H / 2 - totalTextHeight / 2 + 50;
+
+        // توسيط النص في المساحة المخصصة له (بين الهيدر والفوتر)
+        // بنحسب نقطة البداية بحيث يكون مربع النص كله متسنطر في نص الصورة
+        let startY = 580 - (totalTextHeight - lineHeight) / 2;
 
         ctx.shadowColor = 'rgba(0,0,0,0.3)';
         ctx.shadowBlur = 10;
         ctx.direction = 'rtl'; // تأكيد الاتجاه من اليمين لليسار
 
         lines.forEach((line, i) => {
-            // إضافة مسافة خفيفة بين الحروف لو فيه تداخل (letter-spacing مش متوفر في Canvas بسهولة بس بنعوضه بتباعد السطور)
             ctx.fillText(line.trim(), W / 2, startY + (i * lineHeight));
         });
         ctx.shadowBlur = 0;
@@ -1323,18 +1327,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 7. اسم السورة والآية (Metadata)
         ctx.fillStyle = '#fbbf24';
-        ctx.font = '600 50px Tajawal, sans-serif';
-        // 7. اسم السورة والآية (Metadata)
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = '600 50px Tajawal, sans-serif';
+        ctx.font = '700 48px Tajawal, sans-serif';
 
-        // تنظيف اسم السورة من أي تكرار لكلمة "سورة" (بما في ذلك التشكيل الشائع)
-        // بنشيل كلمة سورة في أول النص أو أي مكان ونضيفها إحنا باحترافية مرة واحدة
-        let cleanSurah = data.surah.replace(/سورة/g, '')
-            .replace(/سُورَةُ/g, '')
-            .replace(/سُورَةِ/g, '')
-            .replace(/سُورَةَ/g, '')
-            .trim();
+        // تنظيف اسم السورة من أي تكرار لكلمة "سورة" عشان الشكل يبقى احترافي
+        let cleanSurah = data.surah.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
 
         ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, H - 220);
 
