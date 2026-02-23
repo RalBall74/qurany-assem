@@ -50,7 +50,7 @@ body.dark-mode {
     width: 100%;
 }
 
-/* Smooth animations to make the app feel alive */
+/* أنيميشن ناعم عشان التطبيق تحسه عايش وبيتنفس */
 @keyframes slideUpFade {
     from {
         opacity: 0;
@@ -187,7 +187,7 @@ body.dark-mode {
     }
 }
 
-/* The navigation bar at the top with the logo and search */
+/* البار اللي فوق اللي فيه اللوجو والبحث */
 .top-header {
     height: auto;
     padding: 1.2rem;
@@ -289,7 +289,7 @@ body.dark-mode .search-bar:focus-within {
     box-shadow: 0 4px 10px rgba(230, 126, 34, 0.2);
 }
 
-/* The middle part of the screen where everything is shown */
+/* الحتة اللي في النص اللي بيتعرض فيها كل حاجة */
 .main-content {
     flex: 1;
     display: flex;
@@ -305,7 +305,7 @@ body.dark-mode .search-bar:focus-within {
     scroll-behavior: smooth;
 }
 
-/* Making sure the scrollbars don't clutter the clean layout */
+/* بنخفي السكرول عشان الشكل يفضل نضيف وحلو */
 .content-scroll::-webkit-scrollbar {
     display: none;
 }
@@ -333,7 +333,7 @@ body.dark-mode .search-bar:focus-within {
     border-radius: 10px;
 }
 
-/* The horizontal scrolling list of Quran reciters */
+/* لستة القراء اللي بتسحب بالعرض */
 .reciters-carousel {
     display: flex;
     gap: 1.2rem;
@@ -388,7 +388,7 @@ body.dark-mode .search-bar:focus-within {
     color: var(--primary-color);
 }
 
-/* The list of all the Surahs (Chapters) */
+/* لستة كل سور القرآن */
 .surah-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -471,7 +471,7 @@ body.dark-mode .surah-card {
     transform: scale(1.1);
 }
 
-/* The player control bar that follows you around as you scroll */
+/* بار المشغل اللي بيمشي معاك وانت بتسحب */
 .player-bar {
     position: fixed;
     bottom: 95px;
@@ -557,13 +557,13 @@ body.dark-mode .player-bar:hover {
     transition: var(--transition-fast);
     cursor: pointer;
     position: relative;
-    /* For loader positioning */
+    /* عشان التظبيط بتاع اللودر */
 }
 
 .download-btn.downloading {
     color: var(--primary-color);
     pointer-events: none;
-    /* Prevent multiple clicks */
+    /* عشان نمنع انه يدوس كذا مرة */
 }
 
 .download-btn.downloading i {
@@ -606,7 +606,7 @@ body.dark-mode .player-bar:hover {
     filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.4));
 }
 
-/* Play, Pause, Previous, and Next buttons */
+/* زراير التشغيل والتوقيف واللي قبله واللي بعده */
 .player-controls {
     display: flex;
     flex-direction: column;
@@ -650,7 +650,7 @@ body.dark-mode .player-bar:hover {
     box-shadow: 0 10px 25px rgba(26, 188, 156, 0.5);
 }
 
-/* The line that shows how much of the surah you've listened to */
+/* الخط اللي بيوريك سمعت قد ايه من السورة */
 .progress-area {
     width: 100%;
     display: flex;
@@ -685,7 +685,7 @@ body.dark-mode .player-bar:hover {
     font-weight: 600;
 }
 
-/* The main navigation tabs at the very bottom */
+/* زراير المنيو الرئيسية اللي تحت خالص */
 .sidebar {
     position: fixed;
     bottom: 0;
@@ -771,7 +771,7 @@ body.dark-mode .app-copyright {
     opacity: 1;
 }
 
-/* Hover effects for the extra utility buttons */
+/* تأثير الهوفر لما تقف على زراير الحاجات الإضافية */
 #support-btn,
 #sleep-timer-btn {
     transition: var(--transition-base);
@@ -784,7 +784,7 @@ body.dark-mode .app-copyright {
     transform: scale(1.1);
 }
 
-/* The toggle switch to change between Day and Night modes */
+/* الزرار اللي بيبدل بين الثيم الفاتح والغامق */
 .theme-toggle .switch-label {
     width: 50px;
     height: 26px;
@@ -823,7 +823,7 @@ body.dark-mode .app-copyright {
     justify-content: space-around;
 }
 
-/* A banner that pops up if you lose your internet connection */
+/* البانر اللي بيطلع لو النت فصل */
 .offline-banner {
     background-color: #e67e22;
     color: white;
@@ -846,7 +846,7 @@ body.dark-mode .offline-banner {
     background-color: #d35400;
 }
 
-/* Large popups that show verses or settings */
+/* المربعات الكبيرة اللي بتطلع عشان تعرض الآيات أو الإعدادات */
 .ayah-viewer {
     position: fixed;
     top: 50%;
@@ -943,7 +943,7 @@ body.dark-mode .ayah-txt:hover {
     margin: 0 5px;
 }
 
-/* The popup that reminds you to send blessings upon the Prophet (PBUH) */
+/* الـ popup اللي بيفكرك تصلي على النبي (صلى الله عليه وسلم) */
 .salawat-modal {
     display: none;
     opacity: 0;
@@ -1016,7 +1016,7 @@ body.dark-mode .salawat-content {
     background: #16a085;
 }
 
-/* The popup for setting the automatic sleep timer */
+/* الـ popup بتاع تظبيط مؤقت النوم */
 .modal {
     position: fixed;
     top: 0;
@@ -1074,12 +1074,12 @@ body.dark-mode .modal-content {
     background: transparent;
 }
 
-/* We hide these on small screens because browsers have their own volume buttons */
+/* بنخفي دول في الشاشات الصغيرة عشان المتصفحات فيها زراير صوت */
 .volume-controls {
     display: none;
 }
 
-/* Special looks for search results and loading states */
+/* أشكال مخصوصة لنتائج البحث وحالة التحميل */
 .ayah-snippet {
     font-size: 0.85rem;
     color: var(--text-muted);
@@ -1109,7 +1109,7 @@ body.dark-mode .ayah-snippet {
     color: var(--text-muted);
 }
 
-/* The chat interface for the AI assistant */
+/* واجهة الشات بتاعة المساعد الذكي */
 .ai-view {
     display: none;
     flex-direction: column;
@@ -1219,7 +1219,7 @@ body.dark-mode .ai-message .message-content {
     color: var(--text-dark);
 }
 
-/* Making the AI's messages look formatted and nice */
+/* بنخلي رسايل المساعد شكلها مترتب وحلو */
 .message-content p {
     margin-bottom: 0.5rem;
 }
@@ -1248,7 +1248,7 @@ body.dark-mode .ai-message .message-content {
     align-items: center;
     z-index: 50;
     padding-bottom: 120px;
-    /* Glassmorphism Effect */
+    /* تأثير الإزاز الجميل ده */
     background: rgba(255, 255, 255, 0.5) !important;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -1326,7 +1326,7 @@ body.dark-mode .chat-input-wrapper:focus-within {
     box-shadow: none;
 }
 
-/* The small dots that move while the AI is thinking of a reply */
+/* النقط الصغيرة اللي بتتحرك لما المساعد يكون بيفكر في الرد */
 .typing-indicator {
     display: flex;
     gap: 4px;
@@ -1363,28 +1363,28 @@ body.dark-mode .chat-input-wrapper:focus-within {
     }
 }
 
-/* Making sure the AI chat doesn't push other things off the screen */
+/* بنتأكد إن شات المساعد مش بيزق الحاجات التانية بره الشاشة */
 .main-content {
     position: relative;
-    /* Ensure absolute positioning works inside */
+    /* عشان ال positioning يشتغل جوه صح */
 }
 
-/* Fixing the position of the chat box on top of the navigation */
+/* بنثبت مكان الشات فوق المنيو */
 .ai-view .chat-input-area {
     position: fixed;
     bottom: 85px;
-    /* Above nav bar */
+    /* فوق بار المنيو */
     left: 0;
     right: 0;
     padding: 10px 1rem;
     padding-bottom: 10px;
-    /* Reset padding for fixed positioning */
+    /* ريست للبادينج عشان التثبيت */
 }
 
-/* Styling specifically for the Salawat popup modal */
+/* استايلات مخصوصة للمودال بتاع الصلاة على النبي */
 .salawat-modal {
     display: none;
-    /* Controlled by JS */
+    /* الـ JS هو اللي بيتحكم فيه */
     opacity: 0;
     transition: opacity 0.4s ease-in-out;
     background: rgba(0, 0, 0, 0.75);
@@ -1508,7 +1508,7 @@ body.dark-mode .salawat-text {
     transform: translateY(0);
 }
 
-/* The little '...' menu for extra actions on a Surah */
+/* منيو النقط التلاتة للحاجات الإضافية للسورة */
 .more-options-wrapper {
     position: relative;
     display: flex;
@@ -1597,7 +1597,7 @@ body.dark-mode .more-menu {
     text-align: center;
 }
 
-/* Showing that a file is already downloaded onto your device */
+/* بيبين إن في ملف نزل خلاص على جهازك */
 .more-menu button[disabled] {
     opacity: 0.6;
     cursor: not-allowed;
@@ -1609,10 +1609,10 @@ body.dark-mode .more-menu {
     margin-right: auto;
 }
 
-/* Styling for the popup when you're completely offline */
+/* شكل الـ popup لما تكون فاصل نت خالص */
 .offline-modal {
     display: none;
-    /* Hidden by default */
+    /* مخفي في العادي */
     align-items: center;
     justify-content: center;
     z-index: 3000;
@@ -1687,7 +1687,7 @@ body.dark-mode .offline-content {
     }
 }
 
-/* The 'Others' tab with extra features like Athkar and Prayer Times */
+/* تبويبة أخرى اللي فيها ميزات زيادة زي الأذكار ومواقيت الصلاة */
 .others-view {
     animation: slideUpFade 0.6s ease-out;
 }
@@ -1770,14 +1770,14 @@ body.dark-mode .other-card {
     color: var(--primary-color);
 }
 
-/* Making the grid look good on tablets and computers too */
+/* بنخلي الشبكة شكلها حلو على التابلت والكمبيوتر برضه */
 @media (min-width: 768px) {
     .others-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* Styling for the smaller views inside the 'Others' tab */
+/* استايلات للشاشات الصغيرة اللي جوه تبويبة أخرى */
 .others-subview {
     position: absolute;
     top: 0;
@@ -1891,7 +1891,7 @@ body.dark-mode .thikr-card {
     font-weight: 800;
 }
 
-/* The information box about who built this app */
+/* الصندوق اللي فيه معلومات عن اللي عمل التطبيق ده */
 .developer-card {
     background: var(--card-light);
     border-radius: 28px;
@@ -1984,7 +1984,7 @@ body.dark-mode .developer-card {
     font-size: 1.2rem;
 }
 
-/* Styling for the daily supplication highlight */
+/* شكل دعاء اليوم المميز */
 .dua-container {
     background: var(--card-light);
     border-radius: 28px;
@@ -2033,7 +2033,7 @@ body.dark-mode .dua-text {
     transform: rotate(-15deg);
 }
 
-/* The popup that shows the meaning and explanation of verses */
+/* الـ popup اللي بيعرض معنى وتفسير الآيات */
 .tafsir-content {
     max-width: 500px;
     width: 90%;
@@ -2119,7 +2119,7 @@ body.dark-mode .tafsir-body {
     color: var(--text-muted);
 }
 
-/* The interactive Tasbih (Rosary) counter screen */
+/* شاشة عداد السبحة الإلكترونية التفاعلية */
 .rosary-container {
     display: flex;
     flex-direction: column;
@@ -2260,7 +2260,7 @@ body.dark-mode .rosary-reset {
     }
 }
 
-/* The screen that shows the five daily prayer timings */
+/* الشاشة اللي بتعرض مواقيت الصلاة الخمسة */
 .prayer-container {
     padding: 10px;
     animation: slideUpFade 0.5s ease-out;
@@ -2351,7 +2351,7 @@ body.dark-mode .prayer-item {
     margin-right: 5px;
 }
 
-/* ===== The banner asking users to install the app on their phone ===== */
+/* ===== البانر اللي بيطلب من الناس تصطب التطبيق على موبايلاتها ===== */
 @keyframes slideUpBanner {
     from {
         opacity: 0;
@@ -2408,7 +2408,7 @@ body.dark-mode .pwa-install-content {
         0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
-/* Accent line on top */
+/* الخط الجميل اللي فوق */
 .pwa-install-content::before {
     content: '';
     position: absolute;
@@ -2519,7 +2519,7 @@ body.dark-mode .pwa-btn-dismiss {
     color: var(--text-muted-dark);
 }
 
-/* Settings and Toggles */
+/* الإعدادات والزراير اللي بتفتح وتقفل */
 .settings-container {
     display: flex;
     flex-direction: column;
@@ -2564,7 +2564,7 @@ body.dark-mode .settings-item {
     gap: 10px;
 }
 
-/* Toggle Switch Styles */
+/* استايلات زرار الفتح والقفل ده */
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -2634,7 +2634,7 @@ input:checked+.toggle-slider:before {
     line-height: 1.5;
 }
 
-/* ===== Modern AI Icon Styles ===== */
+/* ===== استايلات أيقونة المساعد بتاعنا ===== */
 .modern-ai-icon-container {
     width: 24px;
     height: 24px;
@@ -2663,7 +2663,7 @@ input:checked+.toggle-slider:before {
 
 .ai-icon-glow {
     display: none;
-    /* Reduced animation */
+    /* قللنا الأنيميشن شوية */
 }
 
 .message-avatar .modern-ai-icon-container {
@@ -2682,7 +2682,7 @@ input:checked+.toggle-slider:before {
     }
 }
 
-/* Update Nav Item to accommodate the new icon container instead of i tag */
+/* ظبطنا زرار المنيو عشان ياخد الأيقونة الجديدة بدل القديمة */
 .nav-item .modern-ai-icon-container {
     font-size: 1.4rem;
     color: var(--text-muted);
