@@ -106,6 +106,58 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('offline', updateOnlineStatus);
     }
 
+    // وظائف لعرض الهياكل (Skeletons) المريحة للعين بدل كلمة "تحميل"
+    function showSurahSkeletons() {
+        surahListEl.innerHTML = Array(12).fill(0).map(() => `
+            <div class="surah-card-skeleton">
+                <div class="skeleton-number skeleton"></div>
+                <div class="skeleton-info">
+                    <div class="skeleton-title skeleton"></div>
+                    <div class="skeleton-text skeleton"></div>
+                </div>
+                <div class="skeleton-icon skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showReciterSkeletons() {
+        recitersGridEl.innerHTML = Array(8).fill(0).map(() => `
+            <div class="reciter-skeleton">
+                <div class="skeleton-circle skeleton"></div>
+                <div class="skeleton-name skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showAyahSkeletons() {
+        ayahContent.innerHTML = Array(15).fill(0).map(() => `
+            <div class="ayah-row-skeleton">
+                <div class="skeleton-ayah-text skeleton"></div>
+                <div class="skeleton-ayah-text short skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showPrayerSkeletons() {
+        prayerTimesList.innerHTML = Array(6).fill(0).map(() => `
+            <div class="prayer-item-skeleton">
+                <div class="skeleton-prayer-name skeleton"></div>
+                <div class="skeleton-prayer-time skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showTafsirSkeletons() {
+        tafsirBody.innerHTML = `
+            <div class="tafsir-skeleton">
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line last skeleton"></div>
+            </div>
+        `;
+    }
+
     function updateOnlineStatus() {
         if (!navigator.onLine) {
             offlineBanner.style.display = 'flex';
@@ -116,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // جلب بيانات السور من الـ API
     async function fetchSurahs() {
+        showSurahSkeletons(); // أظهر الهياكل فوراً قبل البدء
         try {
             const response = await fetch('https://api.alquran.cloud/v1/surah');
             const data = await response.json();
@@ -382,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleAyahSearch(query) {
         if (query.length < 3) return;
-        surahListEl.innerHTML = '<div class="loader">جاري البحث في الآيات...</div>';
+        showAyahSkeletons();
         try {
             // بحث بسيط للنص من غير تشكيل عشان يبقى أسهل
             const response = await fetch(`https://api.alquran.cloud/v1/search/${query}/all/quran-simple`);
@@ -427,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // افتح العارض وانزل للآية المطلوبة
                     viewerTitle.textContent = surah.name;
-                    ayahContent.innerHTML = '<div class="loader">جاري تحميل الآيات...</div>';
+                    showAyahSkeletons();
                     ayahViewer.classList.add('active');
 
                     const ayahs = await fetchSurahText(surah.number);
@@ -803,7 +856,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (curIdx === -1) return;
             const surah = surahs[curIdx];
             viewerTitle.textContent = surah.name;
-            ayahContent.innerHTML = '<div class="loader">جاري تحميل الآيات...</div>';
+            showAyahSkeletons();
             ayahViewer.classList.add('active');
             const ayahs = await fetchSurahText(surah.number);
             if (ayahs) {
@@ -965,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!silent) {
-            prayerTimesList.innerHTML = '<div class="loader">جاري تحديد الموقع وجلب المواقيت...</div>';
+            showPrayerSkeletons();
             prayerLocation.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديد...';
         }
 
@@ -1093,7 +1146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const surah = surahs.find(s => s.number == surahNum);
         tafsirTitle.textContent = `تفسير الآية ${ayahNum} - ${surah ? surah.name : ''}`;
-        tafsirBody.innerHTML = '<div class="loader">جاري تحميل التفسير...</div>';
+        showTafsirSkeletons();
         tafsirModal.style.display = 'flex';
 
         const tafsirText = await fetchTafsir(surahNum, ayahNum);
@@ -1226,7 +1279,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- وظيفة توليد كارت الآية بشكل جمالي واحترافي على الـ Canvas ---
     async function generateAyahCard(data) {
         shareModal.style.display = 'flex';
-        sharePreview.innerHTML = '<div class="loader">جاري تجهيز الكارت...</div>';
+        sharePreview.innerHTML = `
+            <div class="tafsir-skeleton" style="padding: 20px;">
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+            </div>
+        `;
 
         const ctx = shareCanvas.getContext('2d');
         const W = shareCanvas.width;

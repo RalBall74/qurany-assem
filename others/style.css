@@ -471,38 +471,44 @@ body.dark-mode .surah-card {
     transform: scale(1.1);
 }
 
-/* بار المشغل اللي بيمشي معاك وانت بتسحب */
+/* بار المشغل اللي بيمشي معاك - تحويله لجزيرة عائمة احترافية */
 .player-bar {
     position: fixed;
-    bottom: 95px;
-    left: 1.2rem;
-    right: 1.2rem;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(25px) saturate(200%);
-    -webkit-backdrop-filter: blur(25px) saturate(200%);
-    border-radius: 32px;
-    padding: 16px 24px;
+    bottom: 100px;
+    /* مرفوع شوية عن المنيو */
+    left: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    padding: 12px 20px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    z-index: 100;
-    animation: slideUpFade 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    gap: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1001;
+    animation: slideUpFloating 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transition: var(--transition-base);
 }
 
+@keyframes slideUpFloating {
+    from {
+        transform: translateY(120%) scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
 body.dark-mode .player-bar {
-    background: rgba(30, 41, 59, 0.75);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.player-bar:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-}
-
-body.dark-mode .player-bar:hover {
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    background: rgba(30, 41, 59, 0.7);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 .song-info {
@@ -685,90 +691,101 @@ body.dark-mode .player-bar:hover {
     font-weight: 600;
 }
 
-/* زراير المنيو الرئيسية اللي تحت خالص */
+/* المنيو السفلي - تحويله لـ Dock عائم احترافي */
 .sidebar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 85px;
-    background: var(--sidebar-light);
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    width: calc(100% - 40px);
+    height: 70px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: 25px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    padding: 8px 0;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 body.dark-mode .sidebar {
-    background: var(--sidebar-dark);
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.05);
 }
 
 .nav-menu {
     display: flex;
     width: 100%;
     justify-content: space-around;
-    padding: 0 1rem;
-    flex: 1;
+    align-items: center;
+    position: relative;
+    height: 100%;
 }
 
+/* بنلغي الـ copyright من هنا عشان الزحمة ونخلي الفوتر شيك */
 .app-copyright {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    opacity: 0.7;
-    margin-top: 5px;
-    font-weight: 600;
-}
-
-body.dark-mode .app-copyright {
-    color: var(--text-muted-dark);
+    display: none;
 }
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 4px;
     border: none;
     background: transparent;
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
     flex: 1;
     transition: var(--transition-base);
-    position: relative;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
 }
 
 .nav-item i {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     transition: var(--transition-base);
 }
 
 .nav-item.active {
     color: var(--primary-color);
-    gap: 1.5px;
 }
 
 .nav-item.active i {
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    filter: drop-shadow(0 5px 10px rgba(26, 188, 156, 0.3));
 }
 
-.nav-item::after {
+/* الـ Indicator اللي بيتحرك تحت الأيقونة */
+.nav-item.active::before {
     content: '';
     position: absolute;
-    bottom: -10px;
-    width: 5px;
-    height: 5px;
+    bottom: 8px;
+    width: 6px;
+    height: 6px;
     background: var(--primary-color);
     border-radius: 50%;
-    opacity: 0;
-    transition: var(--transition-base);
+    box-shadow: 0 0 10px var(--primary-color);
+    animation: bounceIndicator 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.nav-item.active::after {
-    opacity: 1;
+@keyframes bounceIndicator {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* تأثير الهوفر لما تقف على زراير الحاجات الإضافية */
@@ -2112,13 +2129,6 @@ body.dark-mode .tafsir-body {
     color: var(--text-dark);
 }
 
-.tafsir-body .loader {
-    text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: var(--text-muted);
-}
-
 /* شاشة عداد السبحة الإلكترونية التفاعلية */
 .rosary-container {
     display: flex;
@@ -2804,4 +2814,155 @@ body.dark-mode .ayah-action-btn {
     color: white;
     transform: translateY(-2px);
     border-color: var(--primary-color);
+}
+
+
+.skeleton {
+    background: #e1e4e8;
+    background: linear-gradient(90deg, #f0f2f5 25%, #e1e4e8 50%, #f0f2f5 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite linear;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+body.dark-mode .skeleton {
+    background: #2c3e50;
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.surah-card-skeleton {
+    background: var(--card-light);
+    padding: 1.4rem;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.01);
+}
+
+body.dark-mode .surah-card-skeleton {
+    background: var(--card-dark);
+}
+
+.skeleton-number {
+    width: 46px;
+    height: 46px;
+    border-radius: 15px;
+    flex-shrink: 0;
+}
+
+.skeleton-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-title {
+    width: 40%;
+    height: 18px;
+}
+
+.skeleton-text {
+    width: 60%;
+    height: 14px;
+}
+
+.skeleton-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.reciter-skeleton {
+    min-width: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.skeleton-circle {
+    width: 95px;
+    height: 95px;
+    border-radius: 24px;
+}
+
+.skeleton-name {
+    width: 70px;
+    height: 12px;
+}
+
+.prayer-item-skeleton {
+    background: var(--card-light);
+    padding: 1rem 1.4rem;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+}
+
+body.dark-mode .prayer-item-skeleton {
+    background: var(--card-dark);
+}
+
+.skeleton-prayer-name {
+    width: 80px;
+    height: 16px;
+}
+
+.skeleton-prayer-time {
+    width: 60px;
+    height: 24px;
+    border-radius: 8px;
+}
+
+/* Ayah Content Skeleton */
+.ayah-row-skeleton {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-ayah-text {
+    width: 100%;
+    height: 20px;
+    margin-bottom: 10px;
+}
+
+.skeleton-ayah-text.short {
+    width: 40%;
+}
+
+/* Tafsir Skeleton */
+.tafsir-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeleton-line {
+    width: 100%;
+    height: 14px;
+}
+
+.skeleton-line.last {
+    width: 70%;
 }
