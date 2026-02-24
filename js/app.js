@@ -709,7 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rosaryView) rosaryView.style.display = 'none';
                 if (prayerView) prayerView.style.display = 'none';
 
-                if (target === 'home' || target === 'favorites') {
+                if (target === 'home') {
                     playerBar.style.display = 'flex';
                 } else {
                     playerBar.style.display = 'none';
