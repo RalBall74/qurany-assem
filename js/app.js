@@ -816,7 +816,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         notificationsEnabled = false;
                         localStorage.setItem('quran_notifications_enabled', false);
                     } else {
-                        showNotification('تم تفعيل التنبيهات', 'سنقوم بتنبيهك عند دخول وقت الصلاة.');
+                        // إشعار فوري للتأكد إن النظام شغال
+                        showNotification('🤍 تم تفعيل التنبيهات 🤍', 'سيصلك تنبيه بالصلاة على النبي كل دقيقة اختبارياً.');
                         // هنجيب المواقيت لو مش موجودة عشان نشغل التنبيهات
                         if (!prayersTimings) await fetchPrayerTimes(true);
                     }
@@ -1027,8 +1028,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function showNotification(title, body) {
-        if (!("Notification" in window)) return;
+    async function showNotification(title, body) {
+        if (!("Notification" in window)) {
+            console.error("This browser does not support desktop notification");
+            return;
+        }
 
         if (Notification.permission === "granted") {
             const options = {
@@ -1036,9 +1040,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon: 'images/icon-192x192.png',
                 badge: 'images/icon-192x192.png',
                 vibrate: [200, 100, 200],
-                dir: 'rtl'
+                dir: 'rtl',
+                tag: 'quran-notification' // عشان الإشعارات ما تتراكمش فوق بعضها
             };
-            new Notification(title, options);
+
+            // نحاول نستخدم الـ Service Worker لأنه أضمن بكتير خاصة في الموبايل
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                registration.showNotification(title, options);
+            } catch (err) {
+                // لو فشل الـ SW نستخدم الطريقة العادية كـ fallback
+                new Notification(title, options);
+            }
         }
     }
 
