@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sharePreview = document.getElementById('share-card-preview');
     const downloadCardBtn = document.getElementById('download-card-btn');
     const nativeShareBtn = document.getElementById('native-share-btn');
+    const prayerNotifySwitch = document.getElementById('prayer-notify-switch');
 
 
     // حالة التطبيق والحاجات اللي بتتحفظ
@@ -77,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeTafsirAyah = null;
     let activeTafsirSurah = null;
     let prayersTimings = null;
-    let notificationPreferences = { prayer: false };
+    let notificationsEnabled = localStorage.getItem('quran_notifications_enabled') === 'true';
+    let lastCheckedPrayer = localStorage.getItem('quran_last_checked_prayer') || '';
     let readingObserver = null;
 
     // تشغيل الـ App أول ما يفتح
@@ -92,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
         applyTheme();
         updateFavoritesUI();
+        initPrayerNotifications();
         if (tafsirEngineSelect) tafsirEngineSelect.value = currentTafsirEdition;
 
         // Set default reciter if nothing is playing
@@ -798,6 +801,29 @@ document.addEventListener('DOMContentLoaded', () => {
             updateFavoritesUI();
         });
 
+        // لوجيك تفعيل تنبيهات الصلاة
+        if (prayerNotifySwitch) {
+            prayerNotifySwitch.checked = notificationsEnabled;
+            prayerNotifySwitch.addEventListener('change', async () => {
+                notificationsEnabled = prayerNotifySwitch.checked;
+                localStorage.setItem('quran_notifications_enabled', notificationsEnabled);
+
+                if (notificationsEnabled) {
+                    const permission = await Notification.requestPermission();
+                    if (permission !== 'granted') {
+                        alert('يرجى السماح بالتنبيهات من إعدادات المتصفح لتشغيل هذه الميزة.');
+                        prayerNotifySwitch.checked = false;
+                        notificationsEnabled = false;
+                        localStorage.setItem('quran_notifications_enabled', false);
+                    } else {
+                        showNotification('تم تفعيل التنبيهات', 'سنقوم بتنبيهك عند دخول وقت الصلاة.');
+                        // هنجيب المواقيت لو مش موجودة عشان نشغل التنبيهات
+                        if (!prayersTimings) await fetchPrayerTimes(true);
+                    }
+                }
+            });
+        }
+
         // نقطة الدخول لعرض نصوص الآيات في السورة
         showTextBtn.addEventListener('click', async () => {
             if (curIdx === -1) return;
@@ -956,6 +982,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         playerAudio.addEventListener('ended', playNext);
+    }
+
+    // --- نظام التنبيهات الذكي ---
+    function initPrayerNotifications() {
+        // فحص كل دقيقة لو فيه صلاة دخل وقتها
+        setInterval(() => {
+            if (notificationsEnabled && prayersTimings) {
+                checkAndNotifyPrayer();
+            }
+        }, 60000); // كل دقيقة
+
+        // لو لسه فاتح، جرب يجيب المواقيت في الخلفية
+        setTimeout(() => {
+            if (!prayersTimings) fetchPrayerTimes(true);
+        }, 2000);
+    }
+
+    function checkAndNotifyPrayer() {
+        const now = new Date();
+        const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        const prayers = [
+            { key: 'Fajr', name: 'صلاة الفجر' },
+            { key: 'Dhuhr', name: 'صلاة الظهر' },
+            { key: 'Asr', name: 'صلاة العصر' },
+            { key: 'Maghrib', name: 'صلاة المغرب' },
+            { key: 'Isha', name: 'صلاة العشاء' }
+        ];
+
+        if (!prayersTimings) return;
+
+        for (const prayer of prayers) {
+            const prayerTime = prayersTimings[prayer.key];
+            if (prayerTime === currentTime && lastCheckedPrayer !== `${prayer.key}_${now.toDateString()}`) {
+                showNotification(`حان الآن موعد ${prayer.name}`, `أقم صلاتك تنعم بحياتك.. تقبل الله منا ومنكم.`);
+                lastCheckedPrayer = `${prayer.key}_${now.toDateString()}`;
+                localStorage.setItem('quran_last_checked_prayer', lastCheckedPrayer);
+                break;
+            }
+        }
+    }
+
+    function showNotification(title, body) {
+        if (!("Notification" in window)) return;
+
+        if (Notification.permission === "granted") {
+            const options = {
+                body: body,
+                icon: 'images/icon-192x192.png',
+                badge: 'images/icon-192x192.png',
+                vibrate: [200, 100, 200],
+                dir: 'rtl'
+            };
+            new Notification(title, options);
+        }
     }
 
     async function fetchPrayerTimes(silent = false) {
