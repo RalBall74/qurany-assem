@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sharePreview = document.getElementById('share-card-preview');
     const downloadCardBtn = document.getElementById('download-card-btn');
     const nativeShareBtn = document.getElementById('native-share-btn');
-    const prayerNotifySwitch = document.getElementById('prayer-notify-switch');
 
 
     // حالة التطبيق والحاجات اللي بتتحفظ
@@ -78,8 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeTafsirAyah = null;
     let activeTafsirSurah = null;
     let prayersTimings = null;
-    let notificationsEnabled = localStorage.getItem('quran_notifications_enabled') === 'true';
-    let lastCheckedPrayer = localStorage.getItem('quran_last_checked_prayer') || '';
+    let notificationPreferences = { prayer: false };
     let readingObserver = null;
 
     // تشغيل الـ App أول ما يفتح
@@ -94,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
         applyTheme();
         updateFavoritesUI();
-        initPrayerNotifications();
         if (tafsirEngineSelect) tafsirEngineSelect.value = currentTafsirEdition;
 
         // Set default reciter if nothing is playing
@@ -801,30 +798,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateFavoritesUI();
         });
 
-        // لوجيك تفعيل تنبيهات الصلاة
-        if (prayerNotifySwitch) {
-            prayerNotifySwitch.checked = notificationsEnabled;
-            prayerNotifySwitch.addEventListener('change', async () => {
-                notificationsEnabled = prayerNotifySwitch.checked;
-                localStorage.setItem('quran_notifications_enabled', notificationsEnabled);
-
-                if (notificationsEnabled) {
-                    const permission = await Notification.requestPermission();
-                    if (permission !== 'granted') {
-                        alert('يرجى السماح بالتنبيهات من إعدادات المتصفح لتشغيل هذه الميزة.');
-                        prayerNotifySwitch.checked = false;
-                        notificationsEnabled = false;
-                        localStorage.setItem('quran_notifications_enabled', false);
-                    } else {
-                        // إشعار فوري للتأكد إن النظام شغال
-                        showNotification('🤍 تم تفعيل التنبيهات 🤍', 'سيصلك تنبيه بالصلاة على النبي كل دقيقة اختبارياً.');
-                        // هنجيب المواقيت لو مش موجودة عشان نشغل التنبيهات
-                        if (!prayersTimings) await fetchPrayerTimes(true);
-                    }
-                }
-            });
-        }
-
         // نقطة الدخول لعرض نصوص الآيات في السورة
         showTextBtn.addEventListener('click', async () => {
             if (curIdx === -1) return;
@@ -983,76 +956,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         playerAudio.addEventListener('ended', playNext);
-    }
-
-    // --- نظام التنبيهات الذكي ---
-    function initPrayerNotifications() {
-        // فحص كل دقيقة لو فيه صلاة دخل وقتها
-        setInterval(() => {
-            if (notificationsEnabled) {
-                if (prayersTimings) checkAndNotifyPrayer();
-
-                // أشعار تجريبي كل دقيقة للصلة على النبي (للاختبار)
-                showNotification('🤍 صلّ على النبي 🤍', 'اللهم صل وسلم وبارك على نبينا محمد.');
-            }
-        }, 60000); // كل دقيقة
-
-        // لو لسه فاتح، جرب يجيب المواقيت في الخلفية
-        setTimeout(() => {
-            if (!prayersTimings) fetchPrayerTimes(true);
-        }, 2000);
-    }
-
-    function checkAndNotifyPrayer() {
-        const now = new Date();
-        const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-        const prayers = [
-            { key: 'Fajr', name: 'صلاة الفجر' },
-            { key: 'Dhuhr', name: 'صلاة الظهر' },
-            { key: 'Asr', name: 'صلاة العصر' },
-            { key: 'Maghrib', name: 'صلاة المغرب' },
-            { key: 'Isha', name: 'صلاة العشاء' }
-        ];
-
-        if (!prayersTimings) return;
-
-        for (const prayer of prayers) {
-            const prayerTime = prayersTimings[prayer.key];
-            if (prayerTime === currentTime && lastCheckedPrayer !== `${prayer.key}_${now.toDateString()}`) {
-                showNotification(`حان الآن موعد ${prayer.name}`, `أقم صلاتك تنعم بحياتك.. تقبل الله منا ومنكم.`);
-                lastCheckedPrayer = `${prayer.key}_${now.toDateString()}`;
-                localStorage.setItem('quran_last_checked_prayer', lastCheckedPrayer);
-                break;
-            }
-        }
-    }
-
-    async function showNotification(title, body) {
-        if (!("Notification" in window)) {
-            console.error("This browser does not support desktop notification");
-            return;
-        }
-
-        if (Notification.permission === "granted") {
-            const options = {
-                body: body,
-                icon: 'images/icon-192x192.png',
-                badge: 'images/icon-192x192.png',
-                vibrate: [200, 100, 200],
-                dir: 'rtl',
-                tag: 'quran-notification' // عشان الإشعارات ما تتراكمش فوق بعضها
-            };
-
-            // نحاول نستخدم الـ Service Worker لأنه أضمن بكتير خاصة في الموبايل
-            try {
-                const registration = await navigator.serviceWorker.ready;
-                registration.showNotification(title, options);
-            } catch (err) {
-                // لو فشل الـ SW نستخدم الطريقة العادية كـ fallback
-                new Notification(title, options);
-            }
-        }
     }
 
     async function fetchPrayerTimes(silent = false) {

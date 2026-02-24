@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <!-- كلمات البحث والـ SEO -->
-    <title>قرآني | ستماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء</title>
+    <title>قرآني | استماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء</title>
     <meta name="title" content="قرآني - تجربة إيمانية متكاملة لسماع القرآن الكريم">
     <meta name="description"
         content="استمع للقرآن الكريم كاملاً بأصوات أشهر القراء بجودة عالية. تطبيق قرآني يوفر لك تجربة إيمانية متكاملة مع ميزات المساعد الذكي، مواقيت الصلاة، والسبحة الإلكترونية.">
@@ -284,47 +284,12 @@
                         <div class="location-badge" id="prayer-location"><i class="fas fa-map-marker-alt"></i> تحديد
                             الموقع...</div>
                     </div>
-                    <div class="prayer-notification-group">
-                        <div class="notification-toggle-card">
-                            <div class="toggle-info">
-                                <i class="fas fa-bell"></i>
-                                <span>تنبيهات الآذان</span>
-                            </div>
-                            <label class="modern-switch">
-                                <input type="checkbox" id="prayer-notify-switch">
-                                <span class="modern-slider"></span>
-                            </label>
-                        </div>
-                    </div>
                     <div id="prayer-times-list" class="prayer-list">
                         <div class="loader">جاري جلب القِبلة والمواقيت...</div>
                     </div>
+
                 </div>
             </section>
-
-            <!-- Firebase SDKs -->
-            <script type="module">
-                import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-                import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging.js";
-
-                const firebaseConfig = {
-                    apiKey: "AIzaSyBc_62SzCQ0f2F_hDzxxkaj0KsE93m60Ro",
-                    authDomain: "quranu-cdd15.firebaseapp.com",
-                    projectId: "quranu-cdd15",
-                    storageBucket: "quranu-cdd15.firebasestorage.app",
-                    messagingSenderId: "324006127257",
-                    appId: "1:324006127257:web:e42f0c5c675495a7183a08",
-                    measurementId: "G-72YB72VHFV"
-                };
-
-                // Initialize Firebase
-                const app = initializeApp(firebaseConfig);
-                const messaging = getMessaging(app);
-
-                window.firebaseMessaging = messaging;
-                window.firebaseGetToken = getToken;
-                window.firebaseOnMessage = onMessage;
-            </script>
 
 
             <!-- عرض الآيات -->
