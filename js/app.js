@@ -272,6 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         checkDownloadStatus(audioUrl);
         savePlaybackState();
+
+        // أظهر المشغل فور اختيار السورة
+        if (playerBar) playerBar.style.display = 'flex';
     }
 
     async function setupMediaSession(surah) {
@@ -709,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rosaryView) rosaryView.style.display = 'none';
                 if (prayerView) prayerView.style.display = 'none';
 
-                if (target === 'home') {
+                if (target === 'home' && curIdx !== -1) {
                     playerBar.style.display = 'flex';
                 } else {
                     playerBar.style.display = 'none';
@@ -1271,6 +1274,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     checkDownloadStatus(playerAudio.src);
                     renderReciters();
                     renderSurahs(surahs);
+
+                    // أظهر المشغل لو فيه سورة مسجلة من أخر مرة
+                    if (playerBar) playerBar.style.display = 'flex';
                 }
             }
         }
