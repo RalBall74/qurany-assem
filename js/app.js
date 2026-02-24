@@ -988,8 +988,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function initPrayerNotifications() {
         // فحص كل دقيقة لو فيه صلاة دخل وقتها
         setInterval(() => {
-            if (notificationsEnabled && prayersTimings) {
-                checkAndNotifyPrayer();
+            if (notificationsEnabled) {
+                if (prayersTimings) checkAndNotifyPrayer();
+
+                // أشعار تجريبي كل دقيقة للصلة على النبي (للاختبار)
+                showNotification('🤍 صلّ على النبي 🤍', 'اللهم صل وسلم وبارك على نبينا محمد.');
             }
         }, 60000); // كل دقيقة
 
