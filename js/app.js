@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let prayersTimings = null;
     let notificationPreferences = { prayer: false };
     let readingObserver = null;
+    let prayerCountdownInterval = null;
 
     // تشغيل الـ App أول ما يفتح
     init();
@@ -1110,11 +1111,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function highlightNextPrayer(timings) {
+        if (prayerCountdownInterval) clearInterval(prayerCountdownInterval);
+
         const now = new Date();
         const currentTime = now.getHours() * 60 + now.getMinutes();
-
         const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+        const prayerNamesAr = {
+            'Fajr': 'الفجر',
+            'Sunrise': 'الشروق',
+            'Dhuhr': 'الظهر',
+            'Asr': 'العصر',
+            'Maghrib': 'المغرب',
+            'Isha': 'العشاء'
+        };
+
         let nextPrayer = null;
+        let isTomorrow = false;
 
         for (const p of prayers) {
             const [h, m] = timings[p].split(':').map(Number);
@@ -1126,11 +1138,51 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // If no next prayer found today, it means next is Fajr tomorrow
-        if (!nextPrayer) nextPrayer = 'Fajr';
+        if (!nextPrayer) {
+            nextPrayer = 'Fajr';
+            isTomorrow = true;
+        }
 
+        // تمييز الصلاة القادمة في الجدول
         const el = document.getElementById(`prayer-${nextPrayer}`);
         if (el) el.classList.add('next-prayer');
+
+        // بدء العداد التنازلي
+        const countdownCard = document.getElementById('prayer-countdown-card');
+        const nextPrayerNameEl = document.getElementById('next-prayer-name');
+        const countdownTimerEl = document.getElementById('countdown-timer');
+
+        if (countdownCard && nextPrayerNameEl && countdownTimerEl) {
+            countdownCard.style.display = 'flex';
+            nextPrayerNameEl.textContent = prayerNamesAr[nextPrayer];
+
+            const [nextH, nextM] = timings[nextPrayer].split(':').map(Number);
+            const targetDate = new Date();
+            targetDate.setHours(nextH, nextM, 0, 0);
+            if (isTomorrow) targetDate.setDate(targetDate.getDate() + 1);
+
+            const updateCountdown = () => {
+                const nowMs = new Date().getTime();
+                const dist = targetDate.getTime() - nowMs;
+
+                if (dist < 0) {
+                    clearInterval(prayerCountdownInterval);
+                    countdownTimerEl.textContent = "00:00:00";
+                    fetchPrayerTimes(true); // إعادة التحديث لجلب الصلاة التالية
+                    return;
+                }
+
+                const hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((dist % (1000 * 60)) / 1000);
+
+                countdownTimerEl.textContent =
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
+
+            updateCountdown();
+            prayerCountdownInterval = setInterval(updateCountdown, 1000);
+        }
     }
 
 
