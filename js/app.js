@@ -1293,11 +1293,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        const ctx = shareCanvas.getContext('2d');
+        const ctx = shareCanvas.getContext('2d', { alpha: false });
         const W = shareCanvas.width;
         const H = shareCanvas.height;
 
-        // تحميل اللوجو أولاً
+        // تحميل اللوجو
         const logo = new Image();
         logo.src = 'images/icon-512x512.jpg';
         await new Promise(resolve => {
@@ -1305,104 +1305,117 @@ document.addEventListener('DOMContentLoaded', () => {
             logo.onerror = resolve;
         });
 
-        // 1. خلفية داكنة وفخمة (Dark Navy Gradient)
-        const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#0f172a');
-        grad.addColorStop(1, '#1e293b');
-        ctx.fillStyle = grad;
+        // 1. خلفية متدرجة عصرية (Mesh-like Gradient)
+        ctx.fillStyle = '#f8fafc'; // لون أساسي فاتح
         ctx.fillRect(0, 0, W, H);
 
-        // 2. إضافة زخارف إسلامية خفيفة في الخلفية
-        ctx.save();
-        ctx.globalAlpha = 0.05;
-        ctx.strokeStyle = '#fbbf24';
-        ctx.lineWidth = 2;
-        // رسم شبكة زخرفية بسيطة
-        for (let i = 0; i <= W; i += 120) {
-            for (let j = 0; j <= H; j += 120) {
-                ctx.beginPath();
-                ctx.arc(i, j, 40, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-        }
-        ctx.restore();
+        // إضافة فقاعات ملونة ناعمة في الزوايا (زي ستايل الموقع الجديد)
+        const drawBlob = (x, y, radius, color) => {
+            const blobGrad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+            blobGrad.addColorStop(0, color);
+            blobGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = blobGrad;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+        };
 
-        // 3. إطار ذهبي فخم
-        ctx.strokeStyle = '#d97706';
-        ctx.lineWidth = 15;
-        ctx.strokeRect(40, 40, W - 80, H - 80);
-        ctx.lineWidth = 2;
-        ctx.strokeRect(60, 60, W - 120, H - 120);
+        drawBlob(W * 0.9, 0, 800, 'rgba(26, 188, 156, 0.15)'); // Primary
+        drawBlob(0, H * 0.9, 800, 'rgba(72, 201, 176, 0.12)'); // Primary Light
+        drawBlob(W * 0.2, H * 0.3, 600, 'rgba(241, 196, 15, 0.08)'); // Gold
 
-        // 4. وضع اللوجو في الأعلى بشكل دائري شيك
-        const logoSize = 120;
-        const logoY = 160;
-        ctx.save();
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 20;
+        // 2. رسم الكارت الزجاجي (The Glass Card) في المنتصف
+        const cardPadding = 80;
+        const cardX = cardPadding;
+        const cardY = 120;
+        const cardW = W - (cardPadding * 2);
+        const cardH = H - 350;
+        const cornerRadius = 60;
+
+        // ظل الكارت
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.06)';
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetY = 20;
+
+        // جسم الكارت (شبه شفاف)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.beginPath();
-        ctx.arc(W / 2, logoY, logoSize / 2 + 5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
+        if (ctx.roundRect) {
+            ctx.roundRect(cardX, cardY, cardW, cardH, cornerRadius);
+        } else {
+            // fallback for older environments
+            ctx.moveTo(cardX + cornerRadius, cardY);
+            ctx.arcTo(cardX + cardW, cardY, cardX + cardW, cardY + cardH, cornerRadius);
+            ctx.arcTo(cardX + cardW, cardY + cardH, cardX, cardY + cardH, cornerRadius);
+            ctx.arcTo(cardX, cardY + cardH, cardX, cardY, cornerRadius);
+            ctx.arcTo(cardX, cardY, cardX + cardW, cardY, cornerRadius);
+        }
         ctx.fill();
+
+        // إطار الكارت (Inner Glow effect)
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 3. وضع اللوجو وشعار التطبيق (Branding)
+        const logoSize = 100;
+        const brandY = cardY + 120;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(W / 2, brandY, logoSize / 2, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(logo, W / 2 - logoSize / 2, logoY - logoSize / 2, logoSize, logoSize);
+        ctx.drawImage(logo, W / 2 - logoSize / 2, brandY - logoSize / 2, logoSize, logoSize);
         ctx.restore();
 
-        // 5. اسم التطبيق
-        ctx.fillStyle = '#fbbf24';
+        ctx.fillStyle = '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.font = '700 45px Tajawal, sans-serif';
-        ctx.fillText('تطبيق قرآني', W / 2, logoY + 110);
+        ctx.font = '700 40px Tajawal, sans-serif';
+        ctx.fillText('تطبيق قرآني', W / 2, brandY + 100);
 
-        // 6. النص القرآني (الآية) مع خاصية الـ Auto-scaling لمنع التداخل
-        // بنحاول نظبط حجم الخط بحيث يناسب المساحة المتاحة مهما كان طول الآية
-        let fontSize = 80;
-        const maxWidth = W - 200;
-        const maxHeight = 500; // أقصى ارتفاع مسموح به للنص عشان ما يلمسش الهيدر أو الفوتر
+        // 4. النص القرآني (الآية)
+        let fontSize = 75;
+        const textMaxWidth = cardW - 140;
+        const textMaxHeight = cardH - 450;
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#1e293b';
         ctx.textBaseline = 'middle';
 
         let lines = [];
-        // بنقلل حجم الخط بالتدريج لحد ما النص يدخل في المساحة المتاحة أو نوصل لأقل حجم مسموح (25 بكسل)
-        while (fontSize >= 25) {
+        while (fontSize >= 30) {
             ctx.font = `700 ${fontSize}px Amiri, serif`;
-            lines = getWrappedLines(ctx, data.text, maxWidth);
-            const totalH = lines.length * (fontSize * 1.5);
-            if (totalH <= maxHeight || fontSize <= 25) break;
-            fontSize -= 2; // تقليل تدريجي بمقدار بسيط عشان نوصل لأفضل حجم ممكن
+            lines = getWrappedLines(ctx, data.text, textMaxWidth);
+            const totalH = lines.length * (fontSize * 1.6);
+            if (totalH <= textMaxHeight || fontSize <= 30) break;
+            fontSize -= 3;
         }
 
-        const lineHeight = fontSize * 1.5;
+        const lineHeight = fontSize * 1.6;
         const totalTextHeight = lines.length * lineHeight;
+        let startLineY = cardY + 500 - (totalTextHeight / 2);
 
-        // توسيط النص في المساحة المخصصة له (بين الهيدر والفوتر)
-        // بنحسب نقطة البداية بحيث يكون مربع النص كله متسنطر في نص الصورة
-        let startY = 580 - (totalTextHeight - lineHeight) / 2;
-
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 10;
-        ctx.direction = 'rtl'; // تأكيد الاتجاه من اليمين لليسار
-
+        ctx.direction = 'rtl';
         lines.forEach((line, i) => {
-            ctx.fillText(line.trim(), W / 2, startY + (i * lineHeight));
+            ctx.fillText(line.trim(), W / 2, startLineY + (i * lineHeight));
         });
-        ctx.shadowBlur = 0;
         ctx.direction = 'inherit';
 
-        // 7. اسم السورة والآية (Metadata)
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = '700 48px Tajawal, sans-serif';
-
-        // تنظيف اسم السورة من أي تكرار لكلمة "سورة" عشان الشكل يبقى احترافي
+        // 5. اسم السورة والآية (Metadata)
+        ctx.fillStyle = 'rgba(26, 188, 156, 0.9)'; // Primary Color
+        ctx.font = '800 42px Tajawal, sans-serif';
         let cleanSurah = data.surah.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
+        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, cardY + cardH - 120);
 
-        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, H - 220);
+        // 6. الحقوق في الأسفل (Footer)
+        // ctx.fillStyle = '#64748b';
+        // ctx.font = '700 32px Tajawal, sans-serif';
+        // ctx.fillText('جميع الحقوق محفوظة لشركة تدفق © 2026', W / 2, H - 120);
 
-        // 8. الحقوق والرابط
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.font = '300 30px Outfit, sans-serif';
-        ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 110);
+        ctx.fillStyle = 'rgba(26, 188, 156, 0.7)';
+        ctx.font = '600 32px Outfit, sans-serif';
+        ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 100);
 
         // تحديث المعاينة بصورة عالية الجودة
         const image = new Image();
