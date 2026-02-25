@@ -1375,38 +1375,49 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.font = '700 40px Tajawal, sans-serif';
         ctx.fillText('تطبيق قرآني', W / 2, brandY + 100);
 
-        // 4. النص القرآني (الآية)
-        let fontSize = 75;
-        const textMaxWidth = cardW - 140;
-        const textMaxHeight = cardH - 450;
+        // 4. النص القرآني (الآية) - تم تغيير الخط وتركيز المحاذاة ليكون أفخم
+        let fontSize = 70;
+        const textMaxWidth = cardW - 120;
+        // المساحة المتاحة للنص (بين البراند وتحت قبل السورة)
+        const ayahSpaceTop = brandY + 160;
+        const ayahSpaceBottom = cardY + cardH - 180;
+        const textMaxHeight = ayahSpaceBottom - ayahSpaceTop;
 
         ctx.fillStyle = '#1e293b';
         ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
 
         let lines = [];
-        while (fontSize >= 30) {
-            ctx.font = `700 ${fontSize}px Amiri, serif`;
+        while (fontSize >= 28) {
+            // استخدام خط Tajawal لإعطاء طابع عصري ونضيف متوافق مع شكل الموقع
+            ctx.font = `700 ${fontSize}px 'Tajawal', sans-serif`;
             lines = getWrappedLines(ctx, data.text, textMaxWidth);
-            const totalH = lines.length * (fontSize * 1.6);
-            if (totalH <= textMaxHeight || fontSize <= 30) break;
-            fontSize -= 3;
+            const totalH = lines.length * (fontSize * 1.8);
+            if (totalH <= textMaxHeight || fontSize <= 28) break;
+            fontSize -= 4;
         }
 
-        const lineHeight = fontSize * 1.6;
+        const lineHeight = fontSize * 1.8;
         const totalTextHeight = lines.length * lineHeight;
-        let startLineY = cardY + 500 - (totalTextHeight / 2);
+
+        // حساب نقطة البداية بحيث يتوسط النص المسافة المتاحة بالظبط
+        let startLineY = ayahSpaceTop + (textMaxHeight / 2) - (totalTextHeight / 2) + (lineHeight / 2);
 
         ctx.direction = 'rtl';
         lines.forEach((line, i) => {
+            // إضافة ظل خفيف جداً للنص لإعطائه عمق
+            ctx.shadowColor = 'rgba(0,0,0,0.05)';
+            ctx.shadowBlur = 10;
             ctx.fillText(line.trim(), W / 2, startLineY + (i * lineHeight));
         });
+        ctx.shadowBlur = 0;
         ctx.direction = 'inherit';
 
         // 5. اسم السورة والآية (Metadata)
-        ctx.fillStyle = 'rgba(26, 188, 156, 0.9)'; // Primary Color
+        ctx.fillStyle = 'rgba(26, 188, 156, 1)'; // لون الـ Primary واضح
         ctx.font = '800 42px Tajawal, sans-serif';
         let cleanSurah = data.surah.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
-        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, cardY + cardH - 120);
+        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, cardY + cardH - 100);
 
         // 6. الحقوق في الأسفل (Footer)
         // ctx.fillStyle = '#64748b';
