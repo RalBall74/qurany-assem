@@ -147,15 +147,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function appendMessage(role, text) {
         const div = document.createElement('div');
-        div.className = `message ${role} - message`;
+        div.className = `message ${role}-message`;
 
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
         avatar.innerHTML = role === 'ai' ? `
-                        < div class= "modern-ai-icon-container" >
+            <div class="modern-ai-icon-container">
                 <div class="ai-icon-glow"></div>
                 <div class="ai-icon-sparkle"></div>
-            </div > ` : '<i class="fas fa-user"></i>';
+            </div>` : '<i class="fas fa-user"></i>';
 
         const content = document.createElement('div');
         content.className = 'message-content';
@@ -177,20 +177,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
         avatar.innerHTML = `
-                < div class="modern-ai-icon-container" >
+            <div class="modern-ai-icon-container">
                 <div class="ai-icon-glow"></div>
                 <div class="ai-icon-sparkle"></div>
-            </div > `;
+            </div>`;
 
         const content = document.createElement('div');
         content.className = 'message-content';
         content.innerHTML = `
-                < div class="typing-indicator" >
+            <div class="typing-indicator">
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
-            </div >
-                `;
+            </div>
+        `;
 
         div.appendChild(avatar);
         div.appendChild(content);
