@@ -2160,6 +2160,24 @@ body.dark-mode .developer-card {
     font-size: 1.2rem;
 }
 
+.dev-rights {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(127, 140, 141, 0.1);
+    text-align: center;
+}
+
+.dev-rights p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+body.dark-mode .dev-rights p {
+    color: var(--text-muted-dark);
+}
+
 /* شكل دعاء اليوم المميز */
 .dua-container {
     background: var(--card-light);
