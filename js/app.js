@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let prayersTimings = null;
     let notificationPreferences = { prayer: false };
     let readingObserver = null;
+    let prayerCountdownInterval = null;
 
     // تشغيل الـ App أول ما يفتح
     init();
@@ -106,6 +107,58 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('offline', updateOnlineStatus);
     }
 
+    // وظائف لعرض الهياكل (Skeletons) المريحة للعين بدل كلمة "تحميل"
+    function showSurahSkeletons() {
+        surahListEl.innerHTML = Array(12).fill(0).map(() => `
+            <div class="surah-card-skeleton">
+                <div class="skeleton-number skeleton"></div>
+                <div class="skeleton-info">
+                    <div class="skeleton-title skeleton"></div>
+                    <div class="skeleton-text skeleton"></div>
+                </div>
+                <div class="skeleton-icon skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showReciterSkeletons() {
+        recitersGridEl.innerHTML = Array(8).fill(0).map(() => `
+            <div class="reciter-skeleton">
+                <div class="skeleton-circle skeleton"></div>
+                <div class="skeleton-name skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showAyahSkeletons() {
+        ayahContent.innerHTML = Array(15).fill(0).map(() => `
+            <div class="ayah-row-skeleton">
+                <div class="skeleton-ayah-text skeleton"></div>
+                <div class="skeleton-ayah-text short skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showPrayerSkeletons() {
+        prayerTimesList.innerHTML = Array(6).fill(0).map(() => `
+            <div class="prayer-item-skeleton">
+                <div class="skeleton-prayer-name skeleton"></div>
+                <div class="skeleton-prayer-time skeleton"></div>
+            </div>
+        `).join('');
+    }
+
+    function showTafsirSkeletons() {
+        tafsirBody.innerHTML = `
+            <div class="tafsir-skeleton">
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line last skeleton"></div>
+            </div>
+        `;
+    }
+
     function updateOnlineStatus() {
         if (!navigator.onLine) {
             offlineBanner.style.display = 'flex';
@@ -116,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // جلب بيانات السور من الـ API
     async function fetchSurahs() {
+        showSurahSkeletons(); // أظهر الهياكل فوراً قبل البدء
         try {
             const response = await fetch('https://api.alquran.cloud/v1/surah');
             const data = await response.json();
@@ -219,6 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         checkDownloadStatus(audioUrl);
         savePlaybackState();
+
+        // أظهر المشغل فور اختيار السورة
+        if (playerBar) playerBar.style.display = 'flex';
     }
 
     async function setupMediaSession(surah) {
@@ -382,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleAyahSearch(query) {
         if (query.length < 3) return;
-        surahListEl.innerHTML = '<div class="loader">جاري البحث في الآيات...</div>';
+        showAyahSkeletons();
         try {
             // بحث بسيط للنص من غير تشكيل عشان يبقى أسهل
             const response = await fetch(`https://api.alquran.cloud/v1/search/${query}/all/quran-simple`);
@@ -427,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // افتح العارض وانزل للآية المطلوبة
                     viewerTitle.textContent = surah.name;
-                    ayahContent.innerHTML = '<div class="loader">جاري تحميل الآيات...</div>';
+                    showAyahSkeletons();
                     ayahViewer.classList.add('active');
 
                     const ayahs = await fetchSurahText(surah.number);
@@ -656,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rosaryView) rosaryView.style.display = 'none';
                 if (prayerView) prayerView.style.display = 'none';
 
-                if (target === 'home' || target === 'favorites') {
+                if (target === 'home' && curIdx !== -1) {
                     playerBar.style.display = 'flex';
                 } else {
                     playerBar.style.display = 'none';
@@ -803,7 +860,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (curIdx === -1) return;
             const surah = surahs[curIdx];
             viewerTitle.textContent = surah.name;
-            ayahContent.innerHTML = '<div class="loader">جاري تحميل الآيات...</div>';
+            showAyahSkeletons();
             ayahViewer.classList.add('active');
             const ayahs = await fetchSurahText(surah.number);
             if (ayahs) {
@@ -965,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!silent) {
-            prayerTimesList.innerHTML = '<div class="loader">جاري تحديد الموقع وجلب المواقيت...</div>';
+            showPrayerSkeletons();
             prayerLocation.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديد...';
         }
 
@@ -1054,11 +1111,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function highlightNextPrayer(timings) {
+        if (prayerCountdownInterval) clearInterval(prayerCountdownInterval);
+
         const now = new Date();
         const currentTime = now.getHours() * 60 + now.getMinutes();
-
         const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+        const prayerNamesAr = {
+            'Fajr': 'الفجر',
+            'Sunrise': 'الشروق',
+            'Dhuhr': 'الظهر',
+            'Asr': 'العصر',
+            'Maghrib': 'المغرب',
+            'Isha': 'العشاء'
+        };
+
         let nextPrayer = null;
+        let isTomorrow = false;
 
         for (const p of prayers) {
             const [h, m] = timings[p].split(':').map(Number);
@@ -1070,11 +1138,51 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // If no next prayer found today, it means next is Fajr tomorrow
-        if (!nextPrayer) nextPrayer = 'Fajr';
+        if (!nextPrayer) {
+            nextPrayer = 'Fajr';
+            isTomorrow = true;
+        }
 
+        // تمييز الصلاة القادمة في الجدول
         const el = document.getElementById(`prayer-${nextPrayer}`);
         if (el) el.classList.add('next-prayer');
+
+        // بدء العداد التنازلي
+        const countdownCard = document.getElementById('prayer-countdown-card');
+        const nextPrayerNameEl = document.getElementById('next-prayer-name');
+        const countdownTimerEl = document.getElementById('countdown-timer');
+
+        if (countdownCard && nextPrayerNameEl && countdownTimerEl) {
+            countdownCard.style.display = 'flex';
+            nextPrayerNameEl.textContent = prayerNamesAr[nextPrayer];
+
+            const [nextH, nextM] = timings[nextPrayer].split(':').map(Number);
+            const targetDate = new Date();
+            targetDate.setHours(nextH, nextM, 0, 0);
+            if (isTomorrow) targetDate.setDate(targetDate.getDate() + 1);
+
+            const updateCountdown = () => {
+                const nowMs = new Date().getTime();
+                const dist = targetDate.getTime() - nowMs;
+
+                if (dist < 0) {
+                    clearInterval(prayerCountdownInterval);
+                    countdownTimerEl.textContent = "00:00:00";
+                    fetchPrayerTimes(true); // إعادة التحديث لجلب الصلاة التالية
+                    return;
+                }
+
+                const hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((dist % (1000 * 60)) / 1000);
+
+                countdownTimerEl.textContent =
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
+
+            updateCountdown();
+            prayerCountdownInterval = setInterval(updateCountdown, 1000);
+        }
     }
 
 
@@ -1093,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const surah = surahs.find(s => s.number == surahNum);
         tafsirTitle.textContent = `تفسير الآية ${ayahNum} - ${surah ? surah.name : ''}`;
-        tafsirBody.innerHTML = '<div class="loader">جاري تحميل التفسير...</div>';
+        showTafsirSkeletons();
         tafsirModal.style.display = 'flex';
 
         const tafsirText = await fetchTafsir(surahNum, ayahNum);
@@ -1218,6 +1326,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     checkDownloadStatus(playerAudio.src);
                     renderReciters();
                     renderSurahs(surahs);
+
+                    // أظهر المشغل لو فيه سورة مسجلة من أخر مرة
+                    if (playerBar) playerBar.style.display = 'flex';
                 }
             }
         }
@@ -1226,13 +1337,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- وظيفة توليد كارت الآية بشكل جمالي واحترافي على الـ Canvas ---
     async function generateAyahCard(data) {
         shareModal.style.display = 'flex';
-        sharePreview.innerHTML = '<div class="loader">جاري تجهيز الكارت...</div>';
+        sharePreview.innerHTML = `
+            <div class="tafsir-skeleton" style="padding: 20px;">
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+                <div class="skeleton-line skeleton"></div>
+            </div>
+        `;
 
-        const ctx = shareCanvas.getContext('2d');
+        const ctx = shareCanvas.getContext('2d', { alpha: false });
         const W = shareCanvas.width;
         const H = shareCanvas.height;
 
-        // تحميل اللوجو أولاً
+        // تحميل اللوجو
         const logo = new Image();
         logo.src = 'images/icon-512x512.jpg';
         await new Promise(resolve => {
@@ -1240,108 +1357,128 @@ document.addEventListener('DOMContentLoaded', () => {
             logo.onerror = resolve;
         });
 
-        // 1. خلفية داكنة وفخمة (Dark Navy Gradient)
-        const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#0f172a');
-        grad.addColorStop(1, '#1e293b');
-        ctx.fillStyle = grad;
+        // 1. خلفية متدرجة عصرية (Mesh-like Gradient)
+        ctx.fillStyle = '#f8fafc'; // لون أساسي فاتح
         ctx.fillRect(0, 0, W, H);
 
-        // 2. إضافة زخارف إسلامية خفيفة في الخلفية
-        ctx.save();
-        ctx.globalAlpha = 0.05;
-        ctx.strokeStyle = '#fbbf24';
-        ctx.lineWidth = 2;
-        // رسم شبكة زخرفية بسيطة
-        for (let i = 0; i <= W; i += 120) {
-            for (let j = 0; j <= H; j += 120) {
-                ctx.beginPath();
-                ctx.arc(i, j, 40, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-        }
-        ctx.restore();
+        // إضافة فقاعات ملونة ناعمة في الزوايا (زي ستايل الموقع الجديد)
+        const drawBlob = (x, y, radius, color) => {
+            const blobGrad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+            blobGrad.addColorStop(0, color);
+            blobGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = blobGrad;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+        };
 
-        // 3. إطار ذهبي فخم
-        ctx.strokeStyle = '#d97706';
-        ctx.lineWidth = 15;
-        ctx.strokeRect(40, 40, W - 80, H - 80);
-        ctx.lineWidth = 2;
-        ctx.strokeRect(60, 60, W - 120, H - 120);
+        drawBlob(W * 0.9, 0, 800, 'rgba(26, 188, 156, 0.15)'); // Primary
+        drawBlob(0, H * 0.9, 800, 'rgba(72, 201, 176, 0.12)'); // Primary Light
+        drawBlob(W * 0.2, H * 0.3, 600, 'rgba(241, 196, 15, 0.08)'); // Gold
 
-        // 4. وضع اللوجو في الأعلى بشكل دائري شيك
-        const logoSize = 120;
-        const logoY = 160;
-        ctx.save();
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 20;
+        // 2. رسم الكارت الزجاجي (The Glass Card) في المنتصف
+        const cardPadding = 80;
+        const cardX = cardPadding;
+        const cardY = 120;
+        const cardW = W - (cardPadding * 2);
+        const cardH = H - 350;
+        const cornerRadius = 60;
+
+        // ظل الكارت
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.06)';
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetY = 20;
+
+        // جسم الكارت (شبه شفاف)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.beginPath();
-        ctx.arc(W / 2, logoY, logoSize / 2 + 5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
+        if (ctx.roundRect) {
+            ctx.roundRect(cardX, cardY, cardW, cardH, cornerRadius);
+        } else {
+            // fallback for older environments
+            ctx.moveTo(cardX + cornerRadius, cardY);
+            ctx.arcTo(cardX + cardW, cardY, cardX + cardW, cardY + cardH, cornerRadius);
+            ctx.arcTo(cardX + cardW, cardY + cardH, cardX, cardY + cardH, cornerRadius);
+            ctx.arcTo(cardX, cardY + cardH, cardX, cardY, cornerRadius);
+            ctx.arcTo(cardX, cardY, cardX + cardW, cardY, cornerRadius);
+        }
         ctx.fill();
+
+        // إطار الكارت (Inner Glow effect)
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 3. وضع اللوجو وشعار التطبيق (Branding)
+        const logoSize = 100;
+        const brandY = cardY + 120;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(W / 2, brandY, logoSize / 2, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(logo, W / 2 - logoSize / 2, logoY - logoSize / 2, logoSize, logoSize);
+        ctx.drawImage(logo, W / 2 - logoSize / 2, brandY - logoSize / 2, logoSize, logoSize);
         ctx.restore();
 
-        // 5. اسم التطبيق
-        ctx.fillStyle = '#fbbf24';
+        ctx.fillStyle = '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.font = '700 45px Tajawal, sans-serif';
-        ctx.fillText('تطبيق قرآني', W / 2, logoY + 110);
+        ctx.font = '700 40px Tajawal, sans-serif';
+        ctx.fillText('تطبيق قرآني', W / 2, brandY + 100);
 
-        // 6. النص القرآني (الآية) مع خاصية الـ Auto-scaling لمنع التداخل
-        let fontSize = 85;
-        const maxWidth = W - 240;
-        const maxHeight = H - 650; // المساحة المتاحة للنص
+        // 4. النص القرآني (الآية) - تم تغيير الخط وتركيز المحاذاة ليكون أفخم
+        let fontSize = 70;
+        const textMaxWidth = cardW - 120;
+        // المساحة المتاحة للنص (بين البراند وتحت قبل السورة)
+        const ayahSpaceTop = brandY + 160;
+        const ayahSpaceBottom = cardY + cardH - 180;
+        const textMaxHeight = ayahSpaceBottom - ayahSpaceTop;
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#1e293b';
         ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
 
         let lines = [];
-        // تقليل حجم الخط لو النص طويل جداً
-        do {
-            ctx.font = `700 ${fontSize}px Amiri, serif`;
-            lines = getWrappedLines(ctx, data.text, maxWidth);
-            if (lines.length * (fontSize * 1.6) <= maxHeight || fontSize <= 40) break;
-            fontSize -= 5;
-        } while (fontSize > 40);
+        while (fontSize >= 28) {
+            // استخدام خط Tajawal لإعطاء طابع عصري ونضيف متوافق مع شكل الموقع
+            ctx.font = `700 ${fontSize}px 'Tajawal', sans-serif`;
+            lines = getWrappedLines(ctx, data.text, textMaxWidth);
+            const totalH = lines.length * (fontSize * 1.8);
+            if (totalH <= textMaxHeight || fontSize <= 28) break;
+            fontSize -= 4;
+        }
 
-        const lineHeight = fontSize * 1.6;
+        const lineHeight = fontSize * 1.8;
         const totalTextHeight = lines.length * lineHeight;
-        let startY = H / 2 - totalTextHeight / 2 + 50;
 
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 10;
-        ctx.direction = 'rtl'; // تأكيد الاتجاه من اليمين لليسار
+        // حساب نقطة البداية بحيث يتوسط النص المسافة المتاحة بالظبط
+        let startLineY = ayahSpaceTop + (textMaxHeight / 2) - (totalTextHeight / 2) + (lineHeight / 2);
 
+        ctx.direction = 'rtl';
         lines.forEach((line, i) => {
-            // إضافة مسافة خفيفة بين الحروف لو فيه تداخل (letter-spacing مش متوفر في Canvas بسهولة بس بنعوضه بتباعد السطور)
-            ctx.fillText(line.trim(), W / 2, startY + (i * lineHeight));
+            // إضافة ظل خفيف جداً للنص لإعطائه عمق
+            ctx.shadowColor = 'rgba(0,0,0,0.05)';
+            ctx.shadowBlur = 10;
+            ctx.fillText(line.trim(), W / 2, startLineY + (i * lineHeight));
         });
         ctx.shadowBlur = 0;
         ctx.direction = 'inherit';
 
-        // 7. اسم السورة والآية (Metadata)
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = '600 50px Tajawal, sans-serif';
-        // 7. اسم السورة والآية (Metadata)
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = '600 50px Tajawal, sans-serif';
+        // 5. اسم السورة والآية (Metadata)
+        ctx.fillStyle = 'rgba(26, 188, 156, 1)'; // لون الـ Primary واضح
+        ctx.font = '800 42px Tajawal, sans-serif';
+        let cleanSurah = data.surah.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
+        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, cardY + cardH - 100);
 
-        // تنظيف اسم السورة من أي تكرار لكلمة "سورة" (بما في ذلك التشكيل الشائع)
-        // بنشيل كلمة سورة في أول النص أو أي مكان ونضيفها إحنا باحترافية مرة واحدة
-        let cleanSurah = data.surah.replace(/سورة/g, '')
-            .replace(/سُورَةُ/g, '')
-            .replace(/سُورَةِ/g, '')
-            .replace(/سُورَةَ/g, '')
-            .trim();
+        // 6. الحقوق في الأسفل (Footer)
+        // ctx.fillStyle = '#64748b';
+        // ctx.font = '700 32px Tajawal, sans-serif';
+        // ctx.fillText('جميع الحقوق محفوظة لشركة تدفق © 2026', W / 2, H - 120);
 
-        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, H - 220);
-
-        // 8. الحقوق والرابط
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.font = '300 30px Outfit, sans-serif';
-        ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 110);
+        ctx.fillStyle = 'rgba(26, 188, 156, 0.7)';
+        ctx.font = '600 32px Outfit, sans-serif';
+        ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 100);
 
         // تحديث المعاينة بصورة عالية الجودة
         const image = new Image();
