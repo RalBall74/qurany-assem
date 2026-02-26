@@ -1478,7 +1478,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx.fillStyle = 'rgba(26, 188, 156, 0.7)';
         ctx.font = '600 32px Outfit, sans-serif';
-        ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 100);
+        ctx.fillText('ralball74.github.io/qurany.assem/', W / 2, H - 100);
 
         // تحديث المعاينة بصورة عالية الجودة
         const image = new Image();
