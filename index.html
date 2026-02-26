@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <!-- كلمات البحث والـ SEO -->
-    <title>قرآني | سماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء</title>
+    <title>قرآني | استماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء</title>
     <meta name="title" content="قرآني - تجربة إيمانية متكاملة لسماع القرآن الكريم">
     <meta name="description"
         content="استمع للقرآن الكريم كاملاً بأصوات أشهر القراء بجودة عالية. تطبيق قرآني يوفر لك تجربة إيمانية متكاملة مع ميزات المساعد الذكي، مواقيت الصلاة، والسبحة الإلكترونية.">
@@ -25,30 +25,31 @@
     <meta name="author" content="عاصم محمد كمال ابو النصر">
     <link rel="canonical" href="https://ralball74.github.io/qurany.assem/">
 
-    <!-- حوارات السوشيال ميديا وصورة اللينك -->
-    <meta property="fb:app_id" content="">
+    <!-- حوارات السوشيال ميديا وصورة اللينك (WhatsApp, TikTok, Facebook) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ralball74.github.io/qurany.assem/">
     <meta property="og:site_name" content="تطبيق قرآني">
     <meta property="og:locale" content="ar_SA">
-    <meta property="og:title" content="قرآني | تجربة إيمانية متكاملة لسماع القرآن الكريم">
+    <meta property="og:title" content="قرآني - رفيقك الإيماني">
     <meta property="og:description"
-        content="استمع للقرآن الكريم كاملاً بأصوات أشهر القراء بجودة عالية. تطبيق قرآني يوفر لك تجربة إيمانية متكاملة مع ميزات المساعد الذكي، مواقيت الصلاة، والسبحة الإلكترونية.">
+        content="استمع لأكثر من 20 قارئ، صمم كروت مشاركة لآياتك المفضلة، واسأل المساعد الذكي. تجربة قرآنية فريدة بتصميم زجاجي عصري.">
     <meta property="og:image" content="https://ralball74.github.io/qurany.assem/images/icon-512x512.jpg">
     <meta property="og:image:secure_url" content="https://ralball74.github.io/qurany.assem/images/icon-512x512.jpg">
-    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="512">
     <meta property="og:image:height" content="512">
     <meta property="og:image:alt" content="لوجو تطبيق قرآني">
 
-    <!-- تويتر -->
+    <!-- تويتر (X) -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://ralball74.github.io/qurany.assem/">
-    <meta name="twitter:title" content="تطبيق قرآني - تجربة إيمانية متكاملة">
-    <meta name="twitter:description"
-        content="استمع للقرآن الكريم كاملاً بأصوات أشهر القراء بجودة عالية. تطبيق قرآني يوفر لك تجربة إيمانية متكاملة مع ميزات المساعد الذكي.">
+    <meta name="twitter:title" content="تطبيق قرآني - تصميم عصري لتجربة إيمانية متكاملة">
+    <meta name="twitter:description" content="رفيقك في رحلة القرآن: استماع، قراءة، وتفاعل مع الذكاء الاصطناعي.">
     <meta name="twitter:image" content="https://ralball74.github.io/qurany.assem/images/icon-512x512.jpg">
     <meta name="twitter:image:alt" content="لوجو تطبيق قرآني">
+
+    <!-- تنسيقات إضافية -->
+    <meta name="theme-color" content="#1abc9c">
+    <meta name="apple-mobile-web-app-title" content="قرآني">
+    <meta name="application-name" content="قرآني">
 
     <!-- واتساب وأبل -->
     <link rel="apple-touch-icon" href="images/icon-192x192.png">
@@ -85,6 +86,13 @@
 </head>
 
 <body class="light-mode">
+    <!-- خلفية متدرجة متحركة (Mesh Gradient) -->
+    <div class="mesh-gradient-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <div class="app-container">
         <!-- اللوجو والبحث فوق -->
         <header class="top-header">
@@ -132,7 +140,23 @@
                     <h2>القراء</h2>
                 </div>
                 <div id="reciters-grid" class="reciters-carousel">
-                    <!-- كروت القراء بتترص هنا بالـ JS -->
+                    <!-- Skeletons for reciters -->
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
                 </div>
 
                 <!-- قائمة السور -->
@@ -140,7 +164,31 @@
                     <h2 id="current-category">السور</h2>
                 </div>
                 <div id="surah-list" class="surah-grid">
-                    <div class="loader">جاري التحميل...</div>
+                    <!-- Skeletons for surahs -->
+                    <div class="surah-card-skeleton">
+                        <div class="skeleton-number skeleton"></div>
+                        <div class="skeleton-info">
+                            <div class="skeleton-title skeleton"></div>
+                            <div class="skeleton-text skeleton"></div>
+                        </div>
+                        <div class="skeleton-icon skeleton"></div>
+                    </div>
+                    <div class="surah-card-skeleton">
+                        <div class="skeleton-number skeleton"></div>
+                        <div class="skeleton-info">
+                            <div class="skeleton-title skeleton"></div>
+                            <div class="skeleton-text skeleton"></div>
+                        </div>
+                        <div class="skeleton-icon skeleton"></div>
+                    </div>
+                    <div class="surah-card-skeleton">
+                        <div class="skeleton-number skeleton"></div>
+                        <div class="skeleton-info">
+                            <div class="skeleton-title skeleton"></div>
+                            <div class="skeleton-text skeleton"></div>
+                        </div>
+                        <div class="skeleton-icon skeleton"></div>
+                    </div>
                 </div>
             </section>
 
@@ -236,6 +284,10 @@
                             <i class="fab fa-whatsapp"></i> خدمة العملاء (واتساب)
                         </a>
                     </div>
+                    <div class="dev-rights">
+                        <p>جميع الحقوق محفوظة لشركة تدفق &copy;</p>
+                        <p>برمجة وتصميم: عاصم محمد</p>
+                    </div>
                 </div>
             </section>
 
@@ -283,6 +335,11 @@
                         <p id="prayer-hijri-date">-- -- ----</p>
                         <div class="location-badge" id="prayer-location"><i class="fas fa-map-marker-alt"></i> تحديد
                             الموقع...</div>
+                    </div>
+
+                    <div class="prayer-countdown-card" id="prayer-countdown-card" style="display: none;">
+                        <span class="countdown-label">يبقي على أذان <span id="next-prayer-name">--</span></span>
+                        <div class="countdown-timer" id="countdown-timer">00:00:00</div>
                     </div>
                     <div id="prayer-times-list" class="prayer-list">
                         <div class="loader">جاري جلب القِبلة والمواقيت...</div>
