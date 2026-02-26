@@ -15,11 +15,21 @@
     --card-dark: #1e293b;
     --player-dark: rgba(30, 41, 59, 0.95);
 
+    /* ألوان الفقاعات في المود الليلي */
+    --blob-1: rgba(26, 188, 156, 0.08);
+    --blob-2: rgba(52, 152, 219, 0.05);
+    --blob-3: rgba(142, 68, 173, 0.05);
+
     --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     --glass: blur(20px) saturate(180%);
+
+    /* ألوان الفقاعات المتحركة */
+    --blob-1: rgba(26, 188, 156, 0.15);
+    --blob-2: rgba(72, 201, 176, 0.12);
+    --blob-3: rgba(241, 196, 15, 0.1);
 }
 
 * {
@@ -34,12 +44,12 @@ body {
     height: 100vh;
     overflow: hidden;
     transition: var(--transition-base);
-    background-color: var(--bg-light);
+    background-color: transparent;
     color: var(--text-light);
 }
 
 body.dark-mode {
-    background-color: var(--bg-dark);
+    background-color: transparent;
     color: var(--text-dark);
 }
 
@@ -184,6 +194,76 @@ body.dark-mode {
 
     100% {
         transform: translateY(0);
+    }
+}
+
+/* ===== الخلفية الاحترافية Mesh Gradient ===== */
+.mesh-gradient-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    background: var(--bg-light);
+    transition: var(--transition-slow);
+}
+
+body.dark-mode .mesh-gradient-container {
+    background: var(--bg-dark);
+}
+
+.blob {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: var(--blob-1);
+    filter: blur(80px);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: moveBlob 20s infinite alternate ease-in-out;
+}
+
+.blob-1 {
+    top: -100px;
+    right: -100px;
+    background: var(--blob-1);
+}
+
+.blob-2 {
+    bottom: -150px;
+    left: -100px;
+    background: var(--blob-2);
+    animation-duration: 25s;
+    animation-delay: -5s;
+}
+
+.blob-3 {
+    top: 40%;
+    left: 20%;
+    width: 300px;
+    height: 300px;
+    background: var(--blob-3);
+    animation-duration: 15s;
+    animation-delay: -2s;
+}
+
+@keyframes moveBlob {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(50px, 100px) scale(1.1);
+    }
+
+    66% {
+        transform: translate(-80px, 50px) scale(0.9);
+    }
+
+    100% {
+        transform: translate(0, 0) scale(1);
     }
 }
 
@@ -347,45 +427,81 @@ body.dark-mode .search-bar:focus-within {
 }
 
 .reciter-card {
-    min-width: 110px;
+    min-width: 120px;
     cursor: pointer;
     text-align: center;
     transition: var(--transition-base);
     animation: slideInRight 0.6s ease-out backwards;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .reciter-card img {
-    width: 95px;
-    height: 95px;
-    border-radius: 24px;
+    width: 100px;
+    height: 100px;
+    border-radius: 30px;
     object-fit: cover;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-    border: 3px solid transparent;
+    margin-bottom: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     transition: var(--transition-base);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+body.dark-mode .reciter-card img {
+    border-color: rgba(255, 255, 255, 0.05);
+    background: rgba(30, 41, 59, 0.2);
 }
 
 .reciter-card:hover img {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px) scale(1.05) rotate(2deg);
+    box-shadow: 0 15px 30px rgba(26, 188, 156, 0.2);
+    border-color: var(--primary-color);
 }
 
 .reciter-card.active img {
     border-color: var(--primary-color);
-    padding: 3px;
+    padding: 4px;
+    transform: scale(1.08);
+    box-shadow: 0 0 20px rgba(26, 188, 156, 0.3);
 }
 
 .reciter-card p {
-    font-weight: 700;
+    font-weight: 800;
     font-size: 0.85rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     transition: var(--transition-base);
+    color: var(--text-muted);
+    width: 100%;
+    margin-top: 5px;
+}
+
+body.dark-mode .reciter-card p {
+    color: var(--text-muted-dark);
 }
 
 .reciter-card.active p {
     color: var(--primary-color);
+    transform: translateY(2px);
+}
+
+/* إضافة هالة خفيفة تحت القارئ النشط */
+.reciter-card.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    width: 40px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(26, 188, 156, 0.4);
+    animation: fadeIn 0.3s ease-in;
 }
 
 /* لستة كل سور القرآن */
@@ -396,28 +512,48 @@ body.dark-mode .search-bar:focus-within {
 }
 
 .surah-card {
-    background: var(--card-light);
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(15px) saturate(160%);
+    -webkit-backdrop-filter: blur(15px) saturate(160%);
     padding: 1.4rem;
-    border-radius: 22px;
+    border-radius: 24px;
     display: flex;
     align-items: center;
     gap: 1.2rem;
     cursor: pointer;
     transition: var(--transition-base);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.01);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    border: none;
     animation: slideUpFade 0.5s ease-out backwards;
+    position: relative;
+    overflow: hidden;
 }
 
 body.dark-mode .surah-card {
-    background: var(--card-dark);
-    border-color: rgba(255, 255, 255, 0.02);
+    background: rgba(30, 41, 59, 0.5) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.surah-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+    pointer-events: none;
 }
 
 .surah-card:hover {
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-    border-color: rgba(26, 188, 156, 0.1);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.dark-mode .surah-card:hover {
+    background: rgba(30, 41, 59, 0.7) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .surah-card:active {
@@ -425,22 +561,24 @@ body.dark-mode .surah-card {
 }
 
 .surah-card .number {
-    width: 46px;
-    height: 46px;
-    background: rgba(26, 188, 156, 0.1);
+    width: 50px;
+    height: 50px;
+    background: rgba(26, 188, 156, 0.12);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 15px;
+    border-radius: 16px;
     font-weight: 800;
     color: var(--primary-color);
     transition: var(--transition-base);
+    box-shadow: inset 0 0 15px rgba(26, 188, 156, 0.05);
 }
 
 .surah-card:hover .number {
     background: var(--primary-color);
     color: white;
-    transform: rotate(10deg);
+    transform: rotate(10deg) scale(1.1);
+    box-shadow: 0 8px 15px rgba(26, 188, 156, 0.3);
 }
 
 .surah-info {
@@ -482,7 +620,7 @@ body.dark-mode .surah-card {
     -webkit-backdrop-filter: blur(25px) saturate(200%);
     border-radius: 32px;
     padding: 16px 24px;
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 12px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
@@ -686,89 +824,117 @@ body.dark-mode .player-bar:hover {
 }
 
 /* زراير المنيو الرئيسية اللي تحت خالص */
+/* ===== مودرن جلاس فوتر (المنيو اللي تحت بشكل احترافي) ===== */
 .sidebar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 85px;
-    background: var(--sidebar-light);
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 450px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
     z-index: 1000;
-    padding: 8px 0;
+    padding: 0 15px;
+    border-radius: 25px;
+    transition: var(--transition-base);
 }
 
 body.dark-mode .sidebar {
-    background: var(--sidebar-dark);
+    background: rgba(30, 41, 59, 0.75);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.sidebar:hover {
+    width: 92%;
+    bottom: 25px;
 }
 
 .nav-menu {
     display: flex;
     width: 100%;
     justify-content: space-around;
-    padding: 0 1rem;
-    flex: 1;
+    align-items: center;
+    height: 100%;
 }
 
 .app-copyright {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    opacity: 0.7;
-    margin-top: 5px;
-    font-weight: 600;
-}
-
-body.dark-mode .app-copyright {
-    color: var(--text-muted-dark);
+    display: none;
+    /* شيلناها من هنا عشان نخلي الشكل بروفشنال أكتر */
 }
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 4px;
     border: none;
     background: transparent;
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    flex: 1;
+    height: 100%;
+    padding: 10px 0;
     transition: var(--transition-base);
     position: relative;
+    cursor: pointer;
+    flex: 1;
 }
 
 .nav-item i {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     transition: var(--transition-base);
+    margin-bottom: 2px;
+}
+
+.nav-item span {
+    transition: var(--transition-base);
+    opacity: 0.8;
 }
 
 .nav-item.active {
     color: var(--primary-color);
-    gap: 1.5px;
 }
 
 .nav-item.active i {
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    filter: drop-shadow(0 5px 10px rgba(26, 188, 156, 0.3));
 }
 
+.nav-item.active span {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+/* مؤشر متحرك تحت العنصر النشط */
 .nav-item::after {
     content: '';
     position: absolute;
-    bottom: -10px;
-    width: 5px;
-    height: 5px;
+    bottom: 8px;
+    width: 0;
+    height: 3.5px;
     background: var(--primary-color);
-    border-radius: 50%;
-    opacity: 0;
+    border-radius: 10px;
     transition: var(--transition-base);
+    opacity: 0;
 }
 
 .nav-item.active::after {
+    width: 15px;
     opacity: 1;
+}
+
+/* أنيميشن عند الضغط */
+.nav-item:active {
+    transform: scale(0.9);
 }
 
 /* تأثير الهوفر لما تقف على زراير الحاجات الإضافية */
@@ -1145,7 +1311,7 @@ body.dark-mode .ayah-snippet {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding-bottom: 80px;
+    padding-bottom: 200px;
 }
 
 .message {
@@ -1239,27 +1405,31 @@ body.dark-mode .ai-message .message-content {
 
 .chat-input-area {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 1rem;
+    bottom: 85px;
+    /* رفعناه شوية عشان ما يخبطش في الفوتر الجديد */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 500px;
+    padding: 12px;
     display: flex;
     gap: 10px;
     align-items: center;
     z-index: 50;
-    padding-bottom: 120px;
-    /* تأثير الإزاز الجميل ده */
-    background: rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px;
+    /* تأثير الإزاز الجميل المتناسق مع الفوتر */
+    background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: var(--transition-base);
 }
 
 body.dark-mode .chat-input-area {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+    background: rgba(30, 41, 59, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .chat-input-wrapper {
@@ -1369,16 +1539,14 @@ body.dark-mode .chat-input-wrapper:focus-within {
     /* عشان ال positioning يشتغل جوه صح */
 }
 
-/* بنثبت مكان الشات فوق المنيو */
+/* بنثبت مكان الشات فوق المنيو بشكل احترافي */
 .ai-view .chat-input-area {
     position: fixed;
-    bottom: 85px;
-    /* فوق بار المنيو */
-    left: 0;
-    right: 0;
-    padding: 10px 1rem;
-    padding-bottom: 10px;
-    /* ريست للبادينج عشان التثبيت */
+    bottom: 100px;
+    /* المسافة اللي تخليه فوق الفوتر العائم بالظبط */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
 }
 
 /* استايلات مخصوصة للمودال بتاع الصلاة على النبي */
@@ -1700,7 +1868,9 @@ body.dark-mode .offline-content {
 }
 
 .other-card {
-    background: var(--card-light);
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(15px) saturate(160%);
+    -webkit-backdrop-filter: blur(15px) saturate(160%);
     padding: 1rem 1.2rem;
     border-radius: 20px;
     display: flex;
@@ -1708,30 +1878,36 @@ body.dark-mode .offline-content {
     gap: 1rem;
     cursor: pointer;
     transition: var(--transition-base);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.01);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    border: none;
+    animation: slideUpFade 0.5s ease-out backwards;
 }
 
 body.dark-mode .other-card {
-    background: var(--card-dark);
-    border-color: rgba(255, 255, 255, 0.02);
+    background: rgba(30, 41, 59, 0.45) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .other-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    border-color: var(--primary-color);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.55) !important;
+}
+
+body.dark-mode .other-card:hover {
+    background: rgba(30, 41, 59, 0.6) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
 .other-icon {
-    width: 45px;
-    height: 45px;
-    background: rgba(26, 188, 156, 0.1);
+    width: 42px;
+    height: 42px;
+    background: rgba(26, 188, 156, 0.12);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
-    font-size: 1.2rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
     color: var(--primary-color);
     transition: var(--transition-base);
 }
@@ -1739,7 +1915,7 @@ body.dark-mode .other-card {
 .other-card:hover .other-icon {
     background: var(--primary-color);
     color: white;
-    transform: rotate(-10deg);
+    transform: rotate(-10deg) scale(1.05);
 }
 
 .other-info {
@@ -1984,6 +2160,24 @@ body.dark-mode .developer-card {
     font-size: 1.2rem;
 }
 
+.dev-rights {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(127, 140, 141, 0.1);
+    text-align: center;
+}
+
+.dev-rights p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+body.dark-mode .dev-rights p {
+    color: var(--text-muted-dark);
+}
+
 /* شكل دعاء اليوم المميز */
 .dua-container {
     background: var(--card-light);
@@ -2110,13 +2304,6 @@ body.dark-mode .tafsir-selector select:focus {
 
 body.dark-mode .tafsir-body {
     color: var(--text-dark);
-}
-
-.tafsir-body .loader {
-    text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: var(--text-muted);
 }
 
 /* شاشة عداد السبحة الإلكترونية التفاعلية */
@@ -2293,6 +2480,51 @@ body.dark-mode .rosary-reset {
 .prayer-date-card p {
     font-size: 1rem;
     opacity: 0.9;
+}
+
+.prayer-countdown-card {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    animation: slideUpFade 0.6s ease-out backwards;
+}
+
+body.dark-mode .prayer-countdown-card {
+    background: rgba(30, 41, 59, 0.45);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.countdown-label {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+#next-prayer-name {
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.countdown-timer {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-light);
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .countdown-timer {
+    color: var(--text-dark);
 }
 
 .location-badge {
@@ -2804,4 +3036,155 @@ body.dark-mode .ayah-action-btn {
     color: white;
     transform: translateY(-2px);
     border-color: var(--primary-color);
+}
+
+
+.skeleton {
+    background: #e1e4e8;
+    background: linear-gradient(90deg, #f0f2f5 25%, #e1e4e8 50%, #f0f2f5 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite linear;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+body.dark-mode .skeleton {
+    background: #2c3e50;
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.surah-card-skeleton {
+    background: var(--card-light);
+    padding: 1.4rem;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.01);
+}
+
+body.dark-mode .surah-card-skeleton {
+    background: var(--card-dark);
+}
+
+.skeleton-number {
+    width: 46px;
+    height: 46px;
+    border-radius: 15px;
+    flex-shrink: 0;
+}
+
+.skeleton-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-title {
+    width: 40%;
+    height: 18px;
+}
+
+.skeleton-text {
+    width: 60%;
+    height: 14px;
+}
+
+.skeleton-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.reciter-skeleton {
+    min-width: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.skeleton-circle {
+    width: 95px;
+    height: 95px;
+    border-radius: 24px;
+}
+
+.skeleton-name {
+    width: 70px;
+    height: 12px;
+}
+
+.prayer-item-skeleton {
+    background: var(--card-light);
+    padding: 1rem 1.4rem;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+}
+
+body.dark-mode .prayer-item-skeleton {
+    background: var(--card-dark);
+}
+
+.skeleton-prayer-name {
+    width: 80px;
+    height: 16px;
+}
+
+.skeleton-prayer-time {
+    width: 60px;
+    height: 24px;
+    border-radius: 8px;
+}
+
+/* Ayah Content Skeleton */
+.ayah-row-skeleton {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-ayah-text {
+    width: 100%;
+    height: 20px;
+    margin-bottom: 10px;
+}
+
+.skeleton-ayah-text.short {
+    width: 40%;
+}
+
+/* Tafsir Skeleton */
+.tafsir-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeleton-line {
+    width: 100%;
+    height: 14px;
+}
+
+.skeleton-line.last {
+    width: 70%;
 }
