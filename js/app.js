@@ -56,12 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const prayerHijriDate = document.getElementById('prayer-hijri-date');
     const prayerLocation = document.getElementById('prayer-location');
     const offlineBanner = document.getElementById('offline-banner');
-    const shareModal = document.getElementById('share-modal');
-    const closeShare = document.getElementById('close-share');
-    const shareCanvas = document.getElementById('share-canvas');
-    const sharePreview = document.getElementById('share-card-preview');
-    const downloadCardBtn = document.getElementById('download-card-btn');
     const nativeShareBtn = document.getElementById('native-share-btn');
+    const videosBtn = document.getElementById('videos-btn');
+    const videosView = document.getElementById('videos-view');
+    const videosBack = document.getElementById('videos-back');
+    const videosContainer = document.getElementById('videos-container');
+    const playlistsContainer = document.getElementById('playlists-container');
+    const videoTabBtns = document.querySelectorAll('.video-tab-btn');
 
 
     // حالة التطبيق والحاجات اللي بتتحفظ
@@ -712,6 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (duaView) duaView.style.display = 'none';
                 if (rosaryView) rosaryView.style.display = 'none';
                 if (prayerView) prayerView.style.display = 'none';
+                if (videosView) videosView.style.display = 'none';
 
                 if (target === 'home' && curIdx !== -1) {
                     playerBar.style.display = 'flex';
@@ -784,6 +786,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (othersSection) othersSection.style.display = 'block';
             });
         }
+
+        if (videosBtn) {
+            videosBtn.addEventListener('click', () => {
+                if (othersSection) othersSection.style.display = 'none';
+                if (videosView) {
+                    videosView.style.display = 'block';
+                    renderReligiousVideos();
+                }
+            });
+        }
+
+        if (videosBack) {
+            videosBack.addEventListener('click', () => {
+                if (videosView) videosView.style.display = 'none';
+                if (othersSection) othersSection.style.display = 'block';
+            });
+        }
+
+        // لوجيك التبديل بين الفيديوهات وقوائم التشغيل
+        videoTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                videoTabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const tab = btn.dataset.tab;
+
+                if (tab === 'videos') {
+                    videosContainer.style.display = 'grid';
+                    playlistsContainer.style.display = 'none';
+                    renderReligiousVideos();
+                } else {
+                    videosContainer.style.display = 'none';
+                    playlistsContainer.style.display = 'grid';
+                    renderReligiousPlaylists();
+                }
+            });
+        });
 
         // لوجيك السبحة الإلكترونية الجميل بتاعنا
         if (rosaryBtn) {
@@ -1523,6 +1561,118 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.closePath();
         if (fill) ctx.fill();
         if (stroke) ctx.stroke();
+    }
+
+    // --- فيديوهات دينية من اليوتيوب لزيادة الإيمان (تم الإبقاء على تلاوة سورة التكوير فقط بطلب المستخدم) ---
+    const religiousVideos = [
+        { id: 'vid-1', title: 'تلاوة خاشعة - سورة التكوير وما بعدها', youtubeId: 'M0rOfLg1Aq0', thumbnail: 'https://img.youtube.com/vi/M0rOfLg1Aq0/maxresdefault.jpg', channel: 'مشاري راشد العفاسي', duration: '12:45' }
+    ];
+
+    // --- قوائم تشغيل دينية ---
+    const religiousPlaylists = [
+        { id: 'plist-1', title: 'إنه ربي - أسماء الله الحسنى', playlistId: 'PL_ZXIiZMp3MIllp2SfW-d6FzsRboFpLQn', thumbnail: 'https://i.ytimg.com/vi/oAbE8EjFdbU/hqdefault.jpg', channel: 'شريف علي', count: '34 مقطع' }
+    ];
+
+    function renderReligiousVideos() {
+        if (!videosContainer) return;
+
+        // تأكد إن حاوية قوائم التشغيل مخفية
+        if (playlistsContainer) playlistsContainer.style.display = 'none';
+        videosContainer.style.display = 'grid';
+
+        videosContainer.innerHTML = religiousVideos.map((video, index) => `
+            <div class="video-card" style="animation-delay: ${index * 0.1}s" data-youtube-id="${video.youtubeId}" data-type="video">
+                <div class="video-thumbnail">
+                    <img src="${video.thumbnail}" alt="${video.title}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg'">
+                    <div class="play-overlay">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="video-duration">${video.duration}</div>
+                </div>
+                <div class="video-body">
+                    <h3>${video.title}</h3>
+                    <div class="video-channel">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${video.channel}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        attachVideoClickEvents();
+    }
+
+    function renderReligiousPlaylists() {
+        if (!playlistsContainer) return;
+
+        playlistsContainer.innerHTML = religiousPlaylists.map((playlist, index) => `
+            <div class="video-card" style="animation-delay: ${index * 0.1}s" data-playlist-id="${playlist.playlistId}" data-type="playlist">
+                <div class="video-thumbnail">
+                    <img src="${playlist.thumbnail}" alt="${playlist.title}" loading="lazy">
+                    <div class="play-overlay">
+                        <i class="fas fa-list-ul"></i>
+                    </div>
+                    <div class="video-duration">${playlist.count}</div>
+                </div>
+                <div class="video-body">
+                    <h3>${playlist.title}</h3>
+                    <div class="video-channel">
+                        <i class="fas fa-user"></i>
+                        <span>${playlist.channel}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        attachVideoClickEvents();
+    }
+
+    function attachVideoClickEvents() {
+        document.querySelectorAll('.video-card').forEach(card => {
+            card.onclick = () => {
+                const type = card.dataset.type;
+                if (type === 'video') {
+                    openVideoPlayer(card.dataset.youtubeId, 'video');
+                } else {
+                    openVideoPlayer(card.dataset.playlistId, 'playlist');
+                }
+            };
+        });
+    }
+
+    function openVideoPlayer(id, type = 'video') {
+        const modal = document.createElement('div');
+        modal.className = 'modal video-modal show';
+        modal.style.display = 'flex';
+
+        const embedUrl = type === 'video'
+            ? `https://www.youtube.com/embed/${id}?autoplay=1`
+            : `https://www.youtube.com/embed/videoseries?list=${id}&autoplay=1`;
+
+        modal.innerHTML = `
+            <div class="modal-content video-full-content">
+                <div class="video-header">
+                    <button id="close-video-modal"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="video-iframe-container">
+                    <iframe src="${embedUrl}" 
+                            title="YouTube player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('close-video-modal').onclick = () => {
+            document.body.removeChild(modal);
+        };
+
+        modal.onclick = (e) => {
+            if (e.target === modal) document.body.removeChild(modal);
+        };
     }
 
 });

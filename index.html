@@ -259,6 +259,33 @@
                         <i class="fas fa-chevron-left"></i>
                     </div>
 
+                    <div class="other-card" id="videos-btn">
+                        <div class="other-icon"><i class="fab fa-youtube"></i></div>
+                        <div class="other-info">
+                            <h3>فيديوهات دينية</h3>
+                            <p>مقاطع ومحاضرات مختارة</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- فيديوهات دينية -->
+            <section id="videos-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="videos-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>فيديوهات دينية</h2>
+                </div>
+                <div class="videos-tabs">
+                    <button class="video-tab-btn active" data-tab="videos">الفيديوهات</button>
+                    <button class="video-tab-btn" data-tab="playlists">قوائم التشغيل</button>
+                </div>
+                <div id="videos-container" class="videos-grid">
+                    <div class="loader">جاري جلب الفيديوهات...</div>
+                </div>
+                <div id="playlists-container" class="videos-grid" style="display: none;">
+                    <div class="no-results thin">لا توجد قوائم تشغيل حالياً</div>
                 </div>
             </section>
 
