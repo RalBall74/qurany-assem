@@ -106,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateOnlineStatus();
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
+
+        // فحص دوري كل 10 ثواني عشان نضمن التحديث حتى لو البراوزر مأخدش الإيفنت
+        setInterval(updateOnlineStatus, 10000);
     }
 
     // وظائف لعرض الهياكل (Skeletons) المريحة للعين بدل كلمة "تحميل"
@@ -161,11 +164,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateOnlineStatus() {
-        if (!navigator.onLine) {
-            offlineBanner.style.display = 'flex';
+        const isOnline = navigator.onLine;
+
+        if (!isOnline) {
+            showOfflineUI();
         } else {
-            offlineBanner.style.display = 'none';
+            // Even if navigator says online, double check by trying to reach the server
+            fetch('./others/manifest.json', { method: 'HEAD', cache: 'no-store' })
+                .then(() => hideOfflineUI())
+                .catch(() => showOfflineUI());
         }
+    }
+
+    function showOfflineUI() {
+        if (!offlineBanner) return;
+        offlineBanner.classList.add('show');
+        document.body.classList.add('is-offline');
+    }
+
+    function hideOfflineUI() {
+        if (!offlineBanner) return;
+        offlineBanner.classList.remove('show');
+        document.body.classList.remove('is-offline');
     }
 
     // جلب بيانات السور من الـ API

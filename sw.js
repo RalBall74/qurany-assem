@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-app-v3'; // Bump this number whenever you want to force the browser to update its local files
+const CACHE_NAME = 'quran-app-v4';
 const AUDIO_CACHE_NAME = 'quran-audio-v1';
 
 const CORE_ASSETS = [
@@ -11,14 +11,17 @@ const CORE_ASSETS = [
     './js/ai-service.js',
     './others/manifest.json',
     './images/icon-192x192.png',
-    './images/icon-512x512.jpg'
+    './images/icon-512x512.jpg',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            // Pre-cache core files so the app works offline from the first install
-            return cache.addAll(CORE_ASSETS);
+            console.log('[SW] Pre-caching core assets');
+            return cache.addAll(CORE_ASSETS).catch(err => {
+                console.warn('[SW] Pre-cache warning (some files might be missing):', err);
+            });
         }).then(() => self.skipWaiting())
     );
 });
@@ -29,36 +32,46 @@ self.addEventListener("activate", event => {
             return Promise.all(
                 cacheNames.map(cacheName => {
                     if (cacheName !== CACHE_NAME && cacheName !== AUDIO_CACHE_NAME) {
+                        console.log('[SW] Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
 self.addEventListener("fetch", event => {
     const url = new URL(event.request.url);
 
-    // 1. Audio Files: Use the cached copy if we have it, otherwise download it.
-    if (url.pathname.endsWith('.mp3')) {
+    // Skip non-GET requests
+    if (event.request.method !== 'GET') return;
+
+    // 1. Audio Files: Cache-First
+    if (url.pathname.endsWith('.mp3') || url.hostname.includes('server.mp3quran.net')) {
         event.respondWith(
-            caches.open(AUDIO_CACHE_NAME).then(cache => {
-                return cache.match(event.request).then(response => {
-                    return response || fetch(event.request);
+            caches.match(event.request).then(cachedResponse => {
+                return cachedResponse || fetch(event.request).then(networkResponse => {
+                    if (networkResponse.status === 200 || networkResponse.status === 206) {
+                        const clonedResponse = networkResponse.clone();
+                        caches.open(AUDIO_CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+                    }
+                    return networkResponse;
                 });
             })
         );
         return;
     }
 
-    // 2. API requests to Alquran.cloud: Network first, cache fallback
+    // 2. API requests to Alquran.cloud: Network First with Cache Fallback
     if (url.hostname === 'api.alquran.cloud') {
         event.respondWith(
             fetch(event.request)
                 .then(networkResponse => {
-                    const clonedResponse = networkResponse.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+                    if (networkResponse.ok) {
+                        const clonedResponse = networkResponse.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+                    }
                     return networkResponse;
                 })
                 .catch(() => caches.match(event.request))
@@ -66,26 +79,20 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // 3. Core App Files & Anything else: Cache first, network fallback (with Stale-While-Revalidate)
+    // 3. Static Assets & Others: Cache-First with Stale-While-Revalidate
     event.respondWith(
         caches.match(event.request).then(cachedResponse => {
-            if (cachedResponse) {
-                // Update cache in the background but return cached immediately
-                fetch(event.request).then(networkResponse => {
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse.clone()));
-                }).catch(() => { });
-                return cachedResponse;
-            }
-            // If not in cache, fetch and put in cache
-            return fetch(event.request).then(networkResponse => {
-                const clonedResponse = networkResponse.clone();
-                caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, clonedResponse);
-                });
+            const fetchPromise = fetch(event.request).then(networkResponse => {
+                if (networkResponse.ok) {
+                    const clonedResponse = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+                }
                 return networkResponse;
-            }).catch(error => {
-                console.error('Fetch failed or offline:', error);
+            }).catch(() => {
+                // If network fails, we rely on cache
             });
+
+            return cachedResponse || fetchPromise;
         })
     );
 });

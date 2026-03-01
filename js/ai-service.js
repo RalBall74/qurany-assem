@@ -45,6 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleSend() {
+        if (!navigator.onLine) {
+            appendMessage('ai', 'عذراً، المساعد الذكي يحتاج للاتصال بالإنترنت للإجابة على تساؤلاتك. يمكنك الاستماع للسور المحملة بدون إنترنت.🤍');
+            return;
+        }
+        
+
         const text = aiInput.value.trim();
         if (!text) return;
 
